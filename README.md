@@ -1,4 +1,4 @@
-## Pinboard - to-do app
+## Pinboard — To-Do Application
 ---
 #### 1 Application Description:
 
@@ -28,6 +28,10 @@ The to-do list app includes several basic functions:
 
 Information about users and their tasks is stored in separate database tables.
 
-#### 4 Project code:
+#### 4 Project requirements:
 
-[Source code of the project](https://github.com/Ondrecho/to-do-app/code). 
+The requirements for the project are described in the document ["Requirements Document.pdf"](/docs/Requirements%20Document.pdf)
+
+#### 5 Project code:
+
+[Source code of the project](/code). 
