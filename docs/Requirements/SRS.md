@@ -84,21 +84,21 @@ The application uses the following technologies:
 ## 2.2 User Interface
 
 **Authentication Screen**  
-![Authentication Screen](/mockups/Mobile%20-%20auth.png)  
-![Authentication Screen](/mockups/Desktop%20-%20auth.png)  
+![Authentication Screen](/docs/Mockups/Mobile%20-%20auth.png)  
+![Authentication Screen](/docs/Mockups/Desktop%20-%20auth.png)  
 
 **Main Application Screen**  
-![Main Screen](/mockups/Mobile%20-%20main%20screen.png)  
-![Main Screen](/mockups/Desktop%20-%20main%20screen.png)  
+![Main Screen](/docs/Mockups/Mobile%20-%20main%20screen.png)  
+![Main Screen](/docs/Mockups/Desktop%20-%20main%20screen.png)  
 
 **Navigation Menu**  
-![Navigation Menu](/mockups/Mobile%20-%20menu.png)  
+![Navigation Menu](/docs/Mockups/Mobile%20-%20menu.png)  
 
 **Tasks Management**  
-![Tasks Management](/mockups/Desktop%20-%20tasks.png)  
+![Tasks Management](/docs/Mockups/Desktop%20-%20tasks.png)  
 
 **Task Creation**  
-![Task Creation](/mockups/Desktop%20-%20create%20task%20screen.png)  
+![Task Creation](/docs/Mockups/Desktop%20-%20create%20task%20screen.png)  
 
 <a name="user-characteristics"/>
 
