@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "outDir": "./public",
+    "baseUrl": "src",
+    "target": "ESNext",
+    "allowJs": true,
+    "esModuleInterop": true,
+    "module": "commonjs",
+    "jsx": "react-jsx",
+    "resolveJsonModule": true
+  },
+  "include": [
+    "src",
+    "./src/declarations.ts"
+  ],
+  "exclude": [
+    "./public/**/*" 
+  ]
+}
