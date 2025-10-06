@@ -1,0 +1,23 @@
+# Gradle
+/.gradle/
+build/
+out/
+
+# IntelliJ
+.idea/
+*.iml
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Application properties (local overrides)
+src/main/resources/*.properties
+src/main/resources/*.yml
+
+# Misc
+*.log
+hs_err_pid*
+dependency-reduced-pom.xml
+*.class
