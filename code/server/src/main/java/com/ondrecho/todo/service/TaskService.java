@@ -10,31 +10,37 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class TaskService {
+public class TaskService implements ITaskService {
     private final TaskRepository taskRepository;
 
     public TaskService(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
     }
 
+    @Override
     public List<TaskDto> getTasksForUser(Long userId) {
         return taskRepository.findByUserId(userId).stream().map(this::toDto).collect(Collectors.toList());
     }
 
-    public TaskDto createTask(TaskDto dto) {
+    @Override
+    public TaskDto createTask(TaskDto dto, Long userId) {
         Task task = new Task();
         task.setTitle(dto.getTitle());
         task.setDescription(dto.getDescription());
         task.setImportant(dto.isImportant());
         task.setCreatedAt(dto.getCreatedAt() == null ? OffsetDateTime.now() : dto.getCreatedAt());
-        task.setUserId(dto.getUserId());
+        task.setUserId(userId);
 
         Task saved = taskRepository.save(task);
         return toDto(saved);
     }
 
-    public TaskDto updateTask(TaskDto dto) {
+    @Override
+    public TaskDto updateTask(TaskDto dto, Long userId) {
         Task task = taskRepository.findById(dto.getId()).orElseThrow(() -> new RuntimeException("Task not found"));
+        if (!task.getUserId().equals(userId)) {
+            throw new RuntimeException("Forbidden");
+        }
         task.setTitle(dto.getTitle());
         task.setDescription(dto.getDescription());
         task.setImportant(dto.isImportant());
@@ -43,7 +49,12 @@ public class TaskService {
         return toDto(saved);
     }
 
-    public void deleteTask(Long id) {
+    @Override
+    public void deleteTask(Long id, Long userId) {
+        Task task = taskRepository.findById(id).orElseThrow(() -> new RuntimeException("Task not found"));
+        if (!task.getUserId().equals(userId)) {
+            throw new RuntimeException("Forbidden");
+        }
         taskRepository.deleteById(id);
     }
 

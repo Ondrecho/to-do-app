@@ -1,41 +1,47 @@
 package com.ondrecho.todo.controller;
 
 import com.ondrecho.todo.dto.TaskDto;
-import com.ondrecho.todo.service.TaskService;
+import com.ondrecho.todo.service.ITaskService;
+import com.ondrecho.todo.security.SecurityUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
 @RequestMapping("/task")
 public class TaskController {
-    private final TaskService taskService;
+    private final ITaskService taskService;
 
-    public TaskController(TaskService taskService) { this.taskService = taskService; }
+    public TaskController(ITaskService taskService) { this.taskService = taskService; }
 
     @GetMapping
-    public ResponseEntity<List<TaskDto>> getTasks(@RequestParam(required = false) Long userId) {
-        // if userId not provided, return empty list for now
-        if (userId == null) {
-            return ResponseEntity.ok(List.of());
-        }
+    public ResponseEntity<List<TaskDto>> getTasks(HttpServletRequest request) {
+        Long userId = SecurityUtils.getCurrentUserId(request);
+        if (userId == null) return ResponseEntity.status(401).build();
         return ResponseEntity.ok(taskService.getTasksForUser(userId));
     }
 
     @PostMapping
-    public ResponseEntity<TaskDto> createTask(@RequestBody TaskDto dto) {
-        return ResponseEntity.ok(taskService.createTask(dto));
+    public ResponseEntity<TaskDto> createTask(HttpServletRequest request, @RequestBody TaskDto dto) {
+        Long userId = SecurityUtils.getCurrentUserId(request);
+        if (userId == null) return ResponseEntity.status(401).build();
+        return ResponseEntity.ok(taskService.createTask(dto, userId));
     }
 
     @PutMapping
-    public ResponseEntity<TaskDto> updateTask(@RequestBody TaskDto dto) {
-        return ResponseEntity.ok(taskService.updateTask(dto));
+    public ResponseEntity<TaskDto> updateTask(HttpServletRequest request, @RequestBody TaskDto dto) {
+        Long userId = SecurityUtils.getCurrentUserId(request);
+        if (userId == null) return ResponseEntity.status(401).build();
+        return ResponseEntity.ok(taskService.updateTask(dto, userId));
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteTask(@RequestBody DeleteRequest request) {
-        taskService.deleteTask(request.getId());
+    public ResponseEntity<?> deleteTask(HttpServletRequest request, @RequestBody DeleteRequest requestBody) {
+        Long userId = SecurityUtils.getCurrentUserId(request);
+        if (userId == null) return ResponseEntity.status(401).build();
+        taskService.deleteTask(requestBody.getId(), userId);
         return ResponseEntity.ok().build();
     }
 
