@@ -20,6 +20,7 @@ public class UserService implements IUserService {
         this.jwtProvider = jwtProvider;
     }
 
+    @Override
     public AuthResponse register(AuthRequest request) {
         Optional<User> exists = userRepository.findByUsername(request.getUsername());
         if (exists.isPresent()) {
@@ -31,10 +32,12 @@ public class UserService implements IUserService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user = userRepository.save(user);
 
-    String token = jwtProvider.generateToken(user.getId(), user.getUsername());
-    return new AuthResponse(token, user.getId(), user.getUsername());
+        String token = jwtProvider.generateToken(user.getId(), user.getUsername());
+        AuthResponse resp = new AuthResponse(token, user.getId(), user.getUsername());
+        return resp;
     }
 
+    @Override
     public AuthResponse login(AuthRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
@@ -43,7 +46,8 @@ public class UserService implements IUserService {
             throw new RuntimeException("Invalid credentials");
         }
 
-    String token = jwtProvider.generateToken(user.getId(), user.getUsername());
-    return new AuthResponse(token, user.getId(), user.getUsername());
+        String token = jwtProvider.generateToken(user.getId(), user.getUsername());
+        AuthResponse resp = new AuthResponse(token, user.getId(), user.getUsername());
+        return resp;
     }
 }
