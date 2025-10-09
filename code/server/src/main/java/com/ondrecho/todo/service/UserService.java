@@ -24,7 +24,7 @@ public class UserService implements IUserService {
     public AuthResponse register(AuthRequest request) {
         Optional<User> exists = userRepository.findByUsername(request.getUsername());
         if (exists.isPresent()) {
-            throw new RuntimeException("User already exists");
+            throw new com.ondrecho.todo.exception.ApiException("User already exists");
         }
 
         User user = new User();
@@ -39,12 +39,12 @@ public class UserService implements IUserService {
 
     @Override
     public AuthResponse login(AuthRequest request) {
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+    User user = userRepository.findByUsername(request.getUsername())
+        .orElseThrow(() -> new com.ondrecho.todo.exception.ApiException("Invalid credentials"));
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
-        }
+    if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        throw new com.ondrecho.todo.exception.ApiException("Invalid credentials");
+    }
 
         String token = jwtProvider.generateToken(user.getId(), user.getUsername());
         AuthResponse resp = new AuthResponse(token, user.getId(), user.getUsername());

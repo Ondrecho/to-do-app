@@ -37,9 +37,9 @@ public class TaskService implements ITaskService {
 
     @Override
     public TaskDto updateTask(TaskDto dto, Long userId) {
-        Task task = taskRepository.findById(dto.getId()).orElseThrow(() -> new RuntimeException("Task not found"));
+        Task task = taskRepository.findById(dto.getId()).orElseThrow(() -> new com.ondrecho.todo.exception.NotFoundException("Task not found"));
         if (!task.getUserId().equals(userId)) {
-            throw new RuntimeException("Forbidden");
+            throw new com.ondrecho.todo.exception.ForbiddenException("Forbidden");
         }
         task.setTitle(dto.getTitle());
         task.setDescription(dto.getDescription());
@@ -51,9 +51,9 @@ public class TaskService implements ITaskService {
 
     @Override
     public void deleteTask(Long id, Long userId) {
-        Task task = taskRepository.findById(id).orElseThrow(() -> new RuntimeException("Task not found"));
+        Task task = taskRepository.findById(id).orElseThrow(() -> new com.ondrecho.todo.exception.NotFoundException("Task not found"));
         if (!task.getUserId().equals(userId)) {
-            throw new RuntimeException("Forbidden");
+            throw new com.ondrecho.todo.exception.ForbiddenException("Forbidden");
         }
         taskRepository.deleteById(id);
     }
