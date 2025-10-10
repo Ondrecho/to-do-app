@@ -18,9 +18,9 @@ Quick start (development)
 The server listens on port 5001 and uses context path `/api` so it matches the client `API_URL` setting.
 
 Developer conveniences
-- H2 console: http://localhost:5001/h2-console (enabled for dev)
-- Swagger UI: http://localhost:5001/swagger-ui/index.html
-- OpenAPI JSON: http://localhost:5001/v3/api-docs
+- H2 console: http://localhost:5001/api/h2-console (enabled for dev)
+- Swagger UI: http://localhost:5001/api/swagger-ui/index.html
+- OpenAPI JSON: http://localhost:5001/api/v3/api-docs
 
 Configuration and environment
 - Default dev datasource: H2 in-memory (configured in `application.properties`).
