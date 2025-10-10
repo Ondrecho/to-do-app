@@ -56,3 +56,18 @@ Roadmap (next tasks)
 - Add unit and integration tests (controllers and services).
 - Add Dockerfile and `docker-compose.yml` (server + postgres + client) for local and CI runs.
 
+Docker / production run (local test)
+----------------------------------
+The repository includes a `docker-compose.yml` at the repo root that starts Postgres and the server (builds server image). To run locally:
+
+1. Build the server jar locally:
+
+	./gradlew :code:server:bootJar
+
+2. Start compose:
+
+	docker-compose up --build
+
+The compose file exposes Postgres on 5432 and server on 5001. The server runs with Spring profile `prod` and reads DB credentials from environment variables defined in the compose file.
+
+
