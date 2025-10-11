@@ -70,4 +70,11 @@ The repository includes a `docker-compose.yml` at the repo root that starts Post
 
 The compose file exposes Postgres on 5432 and server on 5001. The server runs with Spring profile `prod` and reads DB credentials from environment variables defined in the compose file.
 
+Notes about DB initialization
+- The compose file mounts `./code/server/docker/initdb.d` into Postgres's `/docker-entrypoint-initdb.d`. Scripts in that folder run only when a fresh volume is initialized (i.e., on the first start). If you change init scripts and want them re-applied, remove the volume first (this will delete DB data):
+
+  docker-compose down -v
+
+- The compose uses a healthcheck for Postgres and the server waits for DB readiness before starting (a small helper script is used). This prevents the server from failing to start when Postgres is still initializing.
+
 
