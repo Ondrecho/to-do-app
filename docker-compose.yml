@@ -34,10 +34,10 @@ services:
     ports:
       - "5001:5001"
 
-  # client: (optional) build or pull your frontend image and expose on 9000/8080
-  #  image: my-frontend
-  #  ports:
-  #    - "9000:80"
+  client:
+    image: my-frontend
+    ports:
+      - "9000:80"
 
 volumes:
   db-data:
