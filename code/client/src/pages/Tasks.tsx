@@ -442,7 +442,7 @@ const Tasks: FC<{ user: User, themeMode: 'light' | 'dark' }> = ({ user, themeMod
                             const textColor = getTaskTextColor(isTaskDone); 
                             
                             const cardBg = task.isImportant 
-                                ? themeMode === 'light' ? '#fff3e0' : '#2d2d48'
+                                ? themeMode === 'light' ? '#fffdbc' : '#2d2d48'
                                 : themeMode === 'light' ? '#ffffff' : '#1e1e1e';
                             
                             return (

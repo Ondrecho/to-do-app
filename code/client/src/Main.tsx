@@ -24,7 +24,7 @@ const Header = ({ user, logout, toggleThemeMode, mode }: HeaderProps) => {
         <AppBar 
             position="static" 
             sx={{ 
-                backgroundColor: 'transparent', 
+                backgroundColor: mode === 'light' ? '#fbedde' : '#272727',
                 boxShadow: 'none', 
                 padding: '16px 0' 
             }}

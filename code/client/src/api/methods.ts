@@ -1,7 +1,4 @@
-// src/api/methods.ts
-
 import axios, { AxiosResponse } from "axios";
-// Импорт типов из отдельного файла
 import { AuthParams, LoginAnswer, Task, User } from "./types";
 
 export const api = axios.create({
@@ -30,9 +27,8 @@ const YESTERDAY_ISO = new Date(Date.now() - 86400000).toISOString();
 const HOUR_AGO_ISO = new Date(Date.now() - 3600000).toISOString();
 
 const MOCK_TASKS: Task[] = [
-    // ИСПРАВЛЕНО: Добавлено isDone: boolean
-    {id: 101, userId: 1, title: "Мокирование завершено", description: "Успешно мокировать все обращения к API для обхода проблем с CORS и TS.", isImportant: true, isDone: false, createdAt: NOW_ISO},
-    {id: 102, userId: 1, title: "Протестировать роутинг", description: "Проверить, что фронтенд корректно переходит между страницами /login, /register и /.", isImportant: false, isDone: true, createdAt: YESTERDAY_ISO}, // isDone = true для примера
+    {id: 101, userId: 1, title: "Настроить авторизацию", description: "Настроить обращения к API.", isImportant: true, isDone: false, createdAt: NOW_ISO},
+    {id: 102, userId: 1, title: "Протестировать роутинг", description: "Проверить, что фронтенд корректно переходит между страницами /login, /register и /.", isImportant: false, isDone: true, createdAt: YESTERDAY_ISO}, 
     {id: 103, userId: 1, title: "Настроить Nginx", description: "Вернуться к настройке Nginx Reverse Proxy после завершения работы над фронтом.", isImportant: false, isDone: false, createdAt: HOUR_AGO_ISO}
 ]
 
@@ -96,7 +92,6 @@ export const method = {
         },
         create(data: Task): Promise<AxiosResponse<Task>> {
             console.log(`MOCK: Creating task: ${data.title}`)
-            // При создании обязательно проставляем isDone
             const newTask: Task = {...data, id: Date.now(), userId: MOCK_USER.id, createdAt: new Date().toISOString(), isDone: false} 
             return new Promise((resolve) => {
                 setTimeout(() => {

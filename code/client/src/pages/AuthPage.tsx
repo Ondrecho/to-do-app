@@ -53,9 +53,9 @@ const Page: React.FC<{isRegistration: boolean}> = ({isRegistration}) => {
 
                 setUser({
                 isAuthenticated: true,
-                username: data.user.username,   // теперь всегда через data.user
+                username: data.user.username,   
                 id: data.user.id,
-                password: data.user.password,   // если нужно хранить (обычно не рекомендуется)
+                password: data.user.password,  
                 });
 
                 setTimeout(() => {
