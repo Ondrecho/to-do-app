@@ -1,12 +1,14 @@
-import React, { useState } from "react" 
-import { ThemeProvider, Typography, Box, Container, AppBar, Toolbar, CssBaseline, Button, IconButton } from "@mui/material" // <-- Добавлен IconButton
+import React, { useState, useMemo } from "react"
+import { ThemeProvider, Typography, Box, Container, AppBar, Toolbar, CssBaseline, Button, IconButton } from "@mui/material" 
 import AuthPage from "./pages/AuthPage"
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import AuthGuard from "./components/utilities/AuthGuard"
 import Tasks from "./pages/Tasks"
 import { User, UserContextType } from './api/types';
-import { theme } from './theme/theme';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
+import { getAppTheme } from './theme/theme'; 
+import Brightness7Icon from '@mui/icons-material/Brightness7'; 
+import Brightness4Icon from '@mui/icons-material/Brightness4'; 
+
 
 export const UserContext = React.createContext<UserContextType | null>(null);
 
@@ -14,14 +16,15 @@ interface HeaderProps {
     user: User | null;
     logout: () => void;
     toggleThemeMode: () => void;
+    mode: 'light' | 'dark'; 
 }
 
-const Header = ({ user, logout, toggleThemeMode }: HeaderProps) => {
+const Header = ({ user, logout, toggleThemeMode, mode }: HeaderProps) => { 
     return (
         <AppBar 
             position="static" 
             sx={{ 
-                backgroundColor: '#fbedde',
+                backgroundColor: 'transparent', 
                 boxShadow: 'none', 
                 padding: '16px 0' 
             }}
@@ -37,21 +40,22 @@ const Header = ({ user, logout, toggleThemeMode }: HeaderProps) => {
                 {user?.isAuthenticated && (
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         
-                        <IconButton 
-                            onClick={toggleThemeMode} 
-                            color="inherit" 
-                            sx={{ color: '#000000' }}
-                        >
-                            <Brightness7Icon />
-                        </IconButton>
-                        
                         <Button 
                             variant="contained" 
-                            color="secondary"
+                            color="primary"
                             onClick={logout}
                         >
                             Log out
                         </Button>
+
+                        <IconButton 
+                            onClick={toggleThemeMode} 
+                            color="inherit" 
+                            sx={{ color: mode === 'light' ? '#0087d7' : '#ffffff' }} 
+                        >
+                            {mode === 'light' ? <Brightness7Icon /> : <Brightness4Icon />}
+                        </IconButton>
+                        
                     </Box>
                 )}
             </Toolbar>
@@ -74,11 +78,7 @@ const Main: React.FC<{}> = ({}) => {
     const [currentThemeMode, setCurrentThemeMode] = useState<'light' | 'dark'>('light'); 
 
     const toggleThemeMode = () => {
-        setCurrentThemeMode(prev => {
-            const newMode = prev === 'light' ? 'dark' : 'light';
-            console.log(`MOCK: Switching theme to ${newMode}`);
-            return newMode;
-        });
+        setCurrentThemeMode(prev => prev === 'light' ? 'dark' : 'light');
     };
     
     const logout = () => {
@@ -90,28 +90,34 @@ const Main: React.FC<{}> = ({}) => {
             isAuthenticated: false,
         })
     }
-
+    
+    const theme = useMemo(() => getAppTheme(currentThemeMode), [currentThemeMode]);
 
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <BrowserRouter>
-                <Header user={user} logout={logout} toggleThemeMode={toggleThemeMode} /> 
-                
-                <Box id="content-wrapper" sx={{ padding: '0 20px' }}> 
-                    <Box id="content-container" sx={{ margin: '0' }}> 
-                        <UserContext.Provider value={{user, setUser}}>
-                            <AuthGuard>
-                                <Routes>
-                                    <Route path="/" element={<Tasks user={user} />}/> 
-                                    <Route path="/login" element={<AuthPage isRegistration={false} />}/>
-                                    <Route path="/register" element={<AuthPage isRegistration={true} />}/>
-                                </Routes>
-                            </AuthGuard>
-                        </UserContext.Provider>
+            <Box sx={{ 
+                minHeight: '100vh', 
+                color: 'text.primary' 
+            }}>
+                <BrowserRouter>
+                    <Header user={user} logout={logout} toggleThemeMode={toggleThemeMode} mode={currentThemeMode} /> 
+                    
+                    <Box id="content-wrapper" sx={{ padding: '0 20px' }}> 
+                        <Box id="content-container" sx={{ margin: '0' }}> 
+                            <UserContext.Provider value={{user, setUser}}>
+                                <AuthGuard>
+                                    <Routes>
+                                        <Route path="/" element={<Tasks user={user} themeMode={currentThemeMode} />}/> 
+                                        <Route path="/login" element={<AuthPage isRegistration={false} />}/>
+                                        <Route path="/register" element={<AuthPage isRegistration={true} />}/>
+                                    </Routes>
+                                </AuthGuard>
+                            </UserContext.Provider>
+                        </Box>
                     </Box>
-                </Box>
-            </BrowserRouter>
+                </BrowserRouter>
+            </Box>
         </ThemeProvider>
     )
 }

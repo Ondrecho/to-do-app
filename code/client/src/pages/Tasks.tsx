@@ -1,4 +1,4 @@
-import { Checkbox, Box, Button, Card, CardActions, CardContent, IconButton, TextField, Typography, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material"
+import { Checkbox, Box, Button, Card, CardActions, CardContent, IconButton, TextField, Typography, List, ListItem, ListItemButton, ListItemIcon, ListItemText, useTheme } from "@mui/material" 
 import { Fragment, useEffect, useState, FC, useContext } from "react";
 import { method } from "../api/methods";
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -160,6 +160,8 @@ const Aside: FC<{
     setCurrentFilter: React.Dispatch<React.SetStateAction<TaskFilter>>
 }> = ({ currentFilter, setCurrentFilter }) => {
     
+    const theme = useTheme();
+
     const filters: { label: string, filter: TaskFilter, icon: JSX.Element }[] = [
         { label: "Tasks", filter: "all", icon: <PushPinIcon /> },
         { label: "Important", filter: "important", icon: <StarIcon /> },
@@ -170,7 +172,7 @@ const Aside: FC<{
         <Box
             component="aside"
             sx={{
-                backgroundColor: '#edd2c4', 
+                backgroundColor: theme.palette.mode === 'light' ? '#edd2c4' : '#272727', 
                 padding: '20px',
                 borderRadius: 3,
                 minHeight: '100%', 
@@ -180,6 +182,15 @@ const Aside: FC<{
                 },
             }}
         >
+            <Typography 
+                variant="h6" 
+                sx={{ 
+                    color: theme.palette.mode === 'light' ? '#1e1e1e' : theme.palette.text.primary, 
+                    marginBottom: '10px' 
+                }}
+            >
+                Filters
+            </Typography>
             <List>
                 {filters.map(({ label, filter, icon }) => (
                     <ListItem key={filter} disablePadding>
@@ -189,9 +200,9 @@ const Aside: FC<{
                             sx={{
                                 borderRadius: 2,
                                 '&.Mui-selected': {
-                                    backgroundColor: '#e6c3af', 
+                                    backgroundColor: theme.palette.mode === 'light' ? '#e6c3af' : '#444444', 
                                     '&:hover': {
-                                        backgroundColor: '#e6c3af',
+                                        backgroundColor: theme.palette.mode === 'light' ? '#e6c3af' : '#444444',
                                     }
                                 }
                             }}
@@ -220,11 +231,13 @@ const Aside: FC<{
 };
 
 
-const Tasks: FC<{ user: User }> = ({ user }) => {
+const Tasks: FC<{ user: User, themeMode: 'light' | 'dark' }> = ({ user, themeMode }) => { 
     const [tasksList, setTasksList] = useState<Task[]>([])
     const [isEditing, setIsEditing] = useState<boolean>(false)
     const [isCreating, setIsCreating] = useState<boolean>(false)
     const [currentFilter, setCurrentFilter] = useState<TaskFilter>('all') 
+
+    const theme = useTheme(); 
 
     const [currentTask, setCurrentTask] = useState<Task>({
         id: 0,
@@ -335,6 +348,15 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
         setIsCreating(true)
     }
 
+    const getTaskTextColor = (isDone: boolean) => {
+        if (isDone) {
+            return '#888'; 
+        }
+        return themeMode === 'light' ? '#121212' : '#ffffff'; 
+    };
+
+    const bgImage = themeMode === 'light' ? 'bg-light.jpg' : 'bg-dark.jpg';
+
 
     return (<Fragment>
         
@@ -347,7 +369,8 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
                 height: '100%',
                 zIndex: -1, 
                 
-                backgroundImage: 'url(/background.jpg)', 
+                backgroundImage: `url(/${bgImage})`, 
+                
                 backgroundSize: 'cover', 
                 backgroundPosition: 'center',
                 backgroundAttachment: 'fixed',
@@ -416,6 +439,11 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
                     >
                         {filteredTasks.map(task => {
                             const isTaskDone = task.isDone;
+                            const textColor = getTaskTextColor(isTaskDone); 
+                            
+                            const cardBg = task.isImportant 
+                                ? themeMode === 'light' ? '#fff3e0' : '#2d2d48'
+                                : themeMode === 'light' ? '#ffffff' : '#1e1e1e';
                             
                             return (
                                 <Card 
@@ -426,7 +454,7 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
                                         flexDirection: "column", 
                                         justifyContent: "space-between",
                                         borderRadius: 3,
-                                        backgroundColor: task.isImportant ? "#b17600ff" : "#1e1e1e",
+                                        backgroundColor: cardBg, 
                                         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)',
                                         opacity: isTaskDone ? 0.7 : 1, 
                                     }}
@@ -443,7 +471,7 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
                                                 margin: "10px 0", 
                                                 fontWeight: 700,
                                                 textDecoration: isTaskDone ? 'line-through' : 'none', 
-                                                color: isTaskDone ? '#888' : 'white',
+                                                color: textColor, 
                                             }}
                                         >
                                             {task.title}
@@ -453,13 +481,13 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
                                             variant="body2"
                                             sx={{
                                                 textDecoration: isTaskDone ? 'line-through' : 'none', 
-                                                color: isTaskDone ? '#888' : 'white',
+                                                color: textColor, 
                                             }}
                                         >
                                             {task.description}
                                         </Typography>
                                     </CardContent>
-                                    <CardActions sx={{ backgroundColor: '#121212' }}>
+                                    <CardActions sx={{ backgroundColor: themeMode === 'light' ? '#f0f0f0' : '#121212' }}>
                                         
                                         <IconButton 
                                             onClick={() => handleDone(task)}
@@ -476,7 +504,7 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
                                             <EditIcon color="primary" />
                                         </IconButton>
                                         <IconButton onClick={() => deleteHandle(task.id)}>
-                                            <DeleteIcon sx={{ color: "#e04848" }}/>
+                                            <DeleteIcon color="secondary"/>
                                         </IconButton>
                                     </CardActions>
                                 </Card>
