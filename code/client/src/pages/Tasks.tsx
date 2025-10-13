@@ -1,23 +1,18 @@
-// src/pages/Tasks.tsx
-
 import { Checkbox, Box, Button, Card, CardActions, CardContent, IconButton, TextField, Typography, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material"
 import { Fragment, useEffect, useState, FC, useContext } from "react";
 import { method } from "../api/methods";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import DoneIcon from '@mui/icons-material/Done'; 
-import PushPinIcon from '@mui/icons-material/PushPin'; // <-- Иконка для All Tasks
-import StarIcon from '@mui/icons-material/Star'; // <-- Иконка для Important
+import PushPinIcon from '@mui/icons-material/PushPin'; 
+import StarIcon from '@mui/icons-material/Star'; 
 import ModalComponent from "../components/utilities/Modal";
 import AlertComponent, { AlertTypes, AlertStateType } from "../components/utilities/Alert";
 import DateSelect from "../components/utilities/DateSelect";
 import { UserContext } from "../Main";
-// Импорт TaskFilter
 import { User, Task, UserContextType, TaskFilter } from '../api/types'; 
 import AddIcon from '@mui/icons-material/Add'; 
 
-
-// Форма (оставлена без изменений, кроме isDone)
 const Form: FC<{
     isCreating: boolean,
     setError: React.Dispatch<React.SetStateAction<AlertStateType>>
@@ -160,7 +155,6 @@ const Form: FC<{
     </Fragment>)
 }
 
-
 const Aside: FC<{
     currentFilter: TaskFilter,
     setCurrentFilter: React.Dispatch<React.SetStateAction<TaskFilter>>
@@ -186,7 +180,6 @@ const Aside: FC<{
                 },
             }}
         >
-            <Typography variant="h6" sx={{ color: '#1e1e1e', marginBottom: '10px' }}>Filters</Typography>
             <List>
                 {filters.map(({ label, filter, icon }) => (
                     <ListItem key={filter} disablePadding>
@@ -196,17 +189,28 @@ const Aside: FC<{
                             sx={{
                                 borderRadius: 2,
                                 '&.Mui-selected': {
-                                    backgroundColor: '#e6c3af', // Выделенный цвет
+                                    backgroundColor: '#e6c3af', 
                                     '&:hover': {
                                         backgroundColor: '#e6c3af',
                                     }
                                 }
                             }}
                         >
-                            <ListItemIcon sx={{ minWidth: 35 }}>
+                            <ListItemIcon 
+                                sx={{ 
+                                    minWidth: 35, 
+                                    color: '#0087d7' 
+                                }}
+                            >
                                 {icon}
                             </ListItemIcon>
-                            <ListItemText primary={label} primaryTypographyProps={{ fontWeight: currentFilter === filter ? 'bold' : 'normal' }} />
+                            <ListItemText 
+                                primary={label} 
+                                primaryTypographyProps={{ 
+                                    fontWeight: currentFilter === filter ? 'bold' : 'normal',
+                                    color: '#0087d7' 
+                                }} 
+                            />
                         </ListItemButton>
                     </ListItem>
                 ))}
@@ -220,7 +224,7 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
     const [tasksList, setTasksList] = useState<Task[]>([])
     const [isEditing, setIsEditing] = useState<boolean>(false)
     const [isCreating, setIsCreating] = useState<boolean>(false)
-    const [currentFilter, setCurrentFilter] = useState<TaskFilter>('all') // <-- ДОБАВЛЕНО: Состояние фильтра
+    const [currentFilter, setCurrentFilter] = useState<TaskFilter>('all') 
 
     const [currentTask, setCurrentTask] = useState<Task>({
         id: 0,
@@ -284,7 +288,6 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
         }
     };
 
-    // <-- ДОБАВЛЕНО: Логика фильтрации
     const getFilteredTasks = (): Task[] => {
         switch (currentFilter) {
             case 'important':
@@ -293,14 +296,13 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
                 return tasksList.filter(task => task.isDone);
             case 'all':
             default:
-                // Показываем все невыполненные задачи, а затем выполненные
                 const notDone = tasksList.filter(task => !task.isDone);
                 const done = tasksList.filter(task => task.isDone);
                 return [...notDone, ...done];
         }
     };
     
-    const filteredTasks = getFilteredTasks(); // <-- ИСПОЛЬЗУЕМ отфильтрованный список
+    const filteredTasks = getFilteredTasks(); 
 
     const gridSize = (textLength: number) => {
         if (textLength > 450) return "span 3";
@@ -336,7 +338,6 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
 
     return (<Fragment>
         
-        {/* ФОН */}
         <Box 
             sx={{
                 position: 'fixed',
@@ -346,7 +347,7 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
                 height: '100%',
                 zIndex: -1, 
                 
-                backgroundImage: 'url(/background.png)', 
+                backgroundImage: 'url(/background.jpg)', 
                 backgroundSize: 'cover', 
                 backgroundPosition: 'center',
                 backgroundAttachment: 'fixed',
@@ -354,7 +355,6 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
         >
         </Box>
 
-        {/* ПЛАВАЮЩАЯ КНОПКА CREATE TASK */}
         <Box
             sx={{
                 position: 'fixed', 
@@ -379,11 +379,8 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
             </Button>
         </Box>
         
-        {/* ОСНОВНОЕ СОДЕРЖИМОЕ */}
         <Box sx={{ paddingTop: '20px' }}>
             
-            
-            {/* ГЛАВНЫЙ КОНТЕЙНЕР: Grid для Aside и Списка Задач */}
             <Box 
             sx={{
                 display: "grid", 
@@ -396,10 +393,8 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
                 }
             }}>
                 
-                {/* ASIDE (Сайдбар) */}
                 <Aside currentFilter={currentFilter} setCurrentFilter={setCurrentFilter} />
                 
-                {/* TASK LIST CONTAINER (Основная область) */}
                 <Box
                     sx={{
                         display: 'flex',
@@ -419,7 +414,6 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
                             paddingBottom: '20px',
                         }}
                     >
-                        {/* ИСПОЛЬЗУЕМ filteredTasks */}
                         {filteredTasks.map(task => {
                             const isTaskDone = task.isDone;
                             
@@ -432,7 +426,7 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
                                         flexDirection: "column", 
                                         justifyContent: "space-between",
                                         borderRadius: 3,
-                                        backgroundColor: task.isImportant ? "#2d2d48" : "#1e1e1e",
+                                        backgroundColor: task.isImportant ? "#b17600ff" : "#1e1e1e",
                                         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)',
                                         opacity: isTaskDone ? 0.7 : 1, 
                                     }}
@@ -442,7 +436,6 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
                                             {formatDate(task.createdAt)}
                                         </Typography>
                                         
-                                        {/* Заголовок */}
                                         <Typography 
                                             variant="h5" 
                                             component="div" 
@@ -456,7 +449,6 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
                                             {task.title}
                                         </Typography>
                                         
-                                        {/* Описание */}
                                         <Typography 
                                             variant="body2"
                                             sx={{
@@ -469,7 +461,6 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
                                     </CardContent>
                                     <CardActions sx={{ backgroundColor: '#121212' }}>
                                         
-                                        {/* КНОПКА ГАЛОЧКИ */}
                                         <IconButton 
                                             onClick={() => handleDone(task)}
                                         >
