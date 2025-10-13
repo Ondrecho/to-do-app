@@ -234,6 +234,7 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
 
     return (<Fragment>
         
+        {/* ФОН */}
         <Box 
             sx={{
                 position: 'fixed',
@@ -250,22 +251,43 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
             }}
         >
         </Box>
+
+        {/* ПЛАВАЮЩАЯ КНОПКА CREATE TASK: Теперь fixed и находится в Fragment */}
+        <Box
+            sx={{
+                position: 'fixed', // Делаем кнопку фиксированной
+                bottom: '30px',
+                right: '30px',
+                zIndex: 100, // Устанавливаем высокий zIndex, чтобы она была над всем
+            }}
+        >
+            <Button 
+                variant="contained" 
+                color="primary"
+                onClick={handleCreateTaskClick} 
+                sx={{
+                    width: '56px',
+                    height: '56px',
+                    borderRadius: '50%',
+                    minWidth: 0,
+                    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.5)',
+                }}
+            >
+                <AddIcon />
+            </Button>
+        </Box>
         
+        {/* ОСНОВНОЕ СОДЕРЖИМОЕ */}
         <Box sx={{ paddingTop: '20px' }}>
-            <Box sx={{mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                 <Typography variant="h4" gutterBottom>
-                    To Do List
-                </Typography>
-                {/* КНОПКА CREATE TASK: УДАЛЕНА ИЗ ЭТОЙ ОБЛАСТИ И ПЕРЕНЕСЕНА ВНИЗ */}
-            </Box>
-        
+            {/* УДАЛЕН БЛОК <h4 class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1vw6mcs-MuiTypography-root">To Do List</h4> */}
+            
             
             {/* ГЛАВНЫЙ КОНТЕЙНЕР: Grid для Aside и Списка Задач */}
             <Box 
             sx={{
                 display: "grid", 
-                // Устанавливаем минимальную высоту, чтобы Aside мог растянуться до футера/конца контента
-                minHeight: 'calc(100vh - 100px)', // Примерная высота окна минус высота хедера и top-padding
+                // Устанавливаем минимальную высоту, чтобы Aside мог растянуться
+                minHeight: 'calc(100vh - 100px)', 
                 gridTemplateColumns: "250px 1fr", 
                 gap: "20px",
 
@@ -300,8 +322,8 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
                     sx={{
                         display: 'flex',
                         flexDirection: 'column',
-                        position: 'relative', // Для позиционирования плавающей кнопки
-                        minHeight: '100%', // Гарантируем, что контейнер задач растянется
+                        // Убрано position: 'relative'
+                        minHeight: '100%', 
                         '@media screen and (max-width: 991px)': {
                             order: 2,
                         },
@@ -313,7 +335,7 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
                             display: "grid", 
                             gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", 
                             gap: "20px",
-                            paddingBottom: '80px', // Отступ снизу для плавающей кнопки
+                            paddingBottom: '20px', // Небольшой отступ в конце списка
                         }}
                     >
                         {tasksList.map(task => {
@@ -357,31 +379,6 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
                                 </Card>
                             )
                         })}
-                    </Box>
-                    
-                    {/* Кнопка CREATE TASK: Плавающая кнопка в правом нижнем углу области задач */}
-                    <Box
-                        sx={{
-                            position: 'absolute',
-                            bottom: '20px',
-                            right: '20px',
-                            zIndex: 10,
-                        }}
-                    >
-                        <Button 
-                            variant="contained" 
-                            color="primary"
-                            onClick={handleCreateTaskClick} 
-                            sx={{
-                                width: '56px',
-                                height: '56px',
-                                borderRadius: '50%',
-                                minWidth: 0,
-                                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.5)',
-                            }}
-                        >
-                            <AddIcon />
-                        </Button>
                     </Box>
                 </Box>
             </Box>
