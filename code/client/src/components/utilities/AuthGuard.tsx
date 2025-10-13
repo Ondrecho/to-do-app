@@ -2,51 +2,45 @@ import { UserContext } from "../../Main";
 import { useEffect, useCallback, useState, ReactNode, Fragment, useContext } from "react";
 import { useNavigate } from "react-router-dom"
 import jwt_decode  from 'jwt-decode';
+import { User } from '../../api/types';
 
 interface AuthGuardProps {
     children: ReactNode;
 }
 
-const AuthGuard: React.FC<AuthGuardProps> = (props) => {
-    const { children } = props;
-
-    const navigate = useNavigate()
-
-    const {user, setUser} = useContext(UserContext)
-
+const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
+    const navigate = useNavigate();
+    const { user, setUser } = useContext(UserContext);
     const [checked, setChecked] = useState<boolean>(false);
 
-    const check = useCallback(() => {
-        if (!localStorage.getItem("token")) {
-            navigate("/login")
-            setUser(prev => {
-                return {
-                    ...prev,
-                    isAuthenticated: false
-                }
-            })
-        } 
-        else {
-            const user: User = jwt_decode(localStorage.getItem("token"));
-
-            setChecked(true)
-            setUser(prev => {
-                return {
-                    ...prev,
-                    id: user.id,
-                    username: user.username,
-                    isAuthenticated: true
-                }
-            })
-        }
-    }, [user.isAuthenticated]);
-  
     useEffect(() => {
-        console.log(user)
-        check();
-    }, [user.isAuthenticated]);
+        const token = localStorage.getItem("token");
+        if (!token) {
+            navigate("/login");
+            setUser(prev => ({ ...prev, isAuthenticated: false }));
+            setChecked(true);
+            return;
+        }
 
-    return <Fragment>{children}</Fragment>
+        try {
+            const decoded: User = jwt_decode(token);
+            setUser({
+                id: decoded.id,
+                username: decoded.username,
+                isAuthenticated: true,
+                password: "",
+            });
+        } catch (err) {
+            localStorage.removeItem("token");
+            navigate("/login");
+        } finally {
+            setChecked(true);
+        }
+    }, []);
+
+    if (!checked) return null;
+
+    return <>{children}</>;
 }
 
 export default AuthGuard

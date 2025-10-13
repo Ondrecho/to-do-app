@@ -6,6 +6,7 @@ import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom"
 import AuthGuard from "./components/utilities/AuthGuard"
 import Tasks from "./pages/Tasks"
 import CssBaseline from "@mui/material/CssBaseline";
+import { User } from './api/types';
 
 type UserContextType = {
     user: User | null

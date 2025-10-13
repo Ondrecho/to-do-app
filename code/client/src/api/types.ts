@@ -1,14 +1,15 @@
-type AuthParams = {
+
+export type AuthParams = {
     username: string,
     password: string
 }
 
-type LoginAnswer = {
+export type LoginAnswer = {
     token: string,
     user: User
 }
 
-type User = {
+export type User = {
     id: number,
     username: string,
     password: string,
@@ -16,7 +17,7 @@ type User = {
     exit?: () => void
 }
 
-type Task = {
+export type Task = {
     id?: number,
     userId?: number,
     title: string,

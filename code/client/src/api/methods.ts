@@ -1,10 +1,9 @@
-
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
+import { AuthParams, LoginAnswer, Task, User } from "./types";
 
 export const api = axios.create({
-    baseURL: "http://localhost:5001",
+    baseURL: "/api",
 });
-
 
 api.interceptors.request.use(
     config => {
@@ -14,27 +13,96 @@ api.interceptors.request.use(
     }
 )
 
+const MOCK_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBZG1pbiIsImlkIjoxLCJpYXQiOjE3NjAzNTE0MjYsImV4cCI6MTc2Mzk1MTQyNn0.ONF59JnZrguNCDwrITZU2KYhkQWQT4gMsnvCHFPmD8o"
+
+const MOCK_USER: User = { 
+    id: 1,
+    username: "Admin",
+    password: "",
+    isAuthenticated: true,
+}
+
+const MOCK_TASKS: Task[] = [
+    {id: 101, userId: 1, title: "Мокирование завершено", description: "Успешно мокировать все обращения к API для обхода проблем с CORS и TS.", isImportant: true},
+    {id: 102, userId: 1, title: "Протестировать роутинг", description: "Проверить, что фронтенд корректно переходит между страницами /login, /register и /.", isImportant: false},
+    {id: 103, userId: 1, title: "Настроить Nginx", description: "Вернуться к настройке Nginx Reverse Proxy после завершения работы над фронтом.", isImportant: false}
+]
+
+const createMockResponse = <T>(data: T): AxiosResponse<T> => ({
+    data,
+    status: 200, 
+    statusText: 'OK', 
+    headers: {}, 
+    config: {} as any
+});
+
+
 export const method = {
     user: {
-        login(data: AuthParams) {
-            return api.post<LoginAnswer>("auth/login", data)
+        login(data: AuthParams): Promise<AxiosResponse<LoginAnswer>> { 
+            console.log(`MOCK: Attempting login for user: ${data.username}`)
+            
+            const mockResponse: LoginAnswer = {
+                token: MOCK_TOKEN,
+                user: MOCK_USER,
+            }
+
+            return new Promise((resolve) => {
+                setTimeout(() => { 
+                    resolve(createMockResponse(mockResponse))
+                }, 500)
+            })
         },
-        register(data: AuthParams) {
-            return api.post("auth/register", data)
+
+        register(data: AuthParams): Promise<AxiosResponse<LoginAnswer>> {
+            console.log(`MOCK: Registering user: ${data.username}`)
+            
+            const mockResponse: LoginAnswer = {
+                token: MOCK_TOKEN,
+                user: MOCK_USER,
+            }
+            
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(createMockResponse(mockResponse))
+                }, 500)
+            })
         },
     },
+    
     task: {
-        get() {
-            return api.get<Task[]>("/task")
+        get(): Promise<AxiosResponse<Task[]>> {
+            console.log("MOCK: Getting tasks.")
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(createMockResponse(MOCK_TASKS))
+                }, 300)
+            })
         },
-        delete(id: string) {
-            return api.delete<{answer: string}>("/task", {data: {id}})
+        delete(id: string): Promise<AxiosResponse<{answer: string}>> {
+            console.log(`MOCK: Deleting task ${id}.`)
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(createMockResponse({answer: `Task ${id} deleted.`}))
+                }, 300)
+            })
         },
-        create(data: Task) {
-            return api.post<Task>("/task", {...data})
+        create(data: Task): Promise<AxiosResponse<Task>> {
+            console.log(`MOCK: Creating task: ${data.title}`)
+            const newTask: Task = {...data, id: Date.now(), userId: MOCK_USER.id}
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(createMockResponse(newTask))
+                }, 300)
+            })
         },
-        update(data: Task) {
-            return api.put<Task>("/task", {...data})
+        update(data: Task): Promise<AxiosResponse<Task>> {
+            console.log(`MOCK: Updating task: ${data.id}`)
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(createMockResponse(data))
+                }, 300)
+            })
         },
     }
 }

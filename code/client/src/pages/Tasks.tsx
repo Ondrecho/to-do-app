@@ -8,6 +8,7 @@ import ModalComponent from "../components/utilities/Modal";
 import AlertComponent, { AlertTypes, AlertStateType } from "../components/utilities/Alert";
 import DateSelect from "../components/utilities/DateSelect";
 import { UserContext } from "../Main";
+import { User, Task } from '../api/types';
 
 const Form: FC<{
     isCreating: boolean,
