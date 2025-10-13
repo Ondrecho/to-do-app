@@ -1,7 +1,5 @@
-// src/Main.tsx
-
 import React, { useMemo } from "react"
-import { ThemeProvider, Typography, Box, Container, AppBar, Toolbar, CssBaseline } from "@mui/material"
+import { ThemeProvider, Typography, Box, Container, AppBar, Toolbar, CssBaseline, Button } from "@mui/material"
 import AuthPage from "./pages/AuthPage"
 import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom"
 import AuthGuard from "./components/utilities/AuthGuard"
@@ -12,28 +10,39 @@ import { theme } from './theme/theme';
 
 export const UserContext = React.createContext<UserContextType | null>(null);
 
-const Header = () => {
+interface HeaderProps {
+    user: User | null;
+    logout: () => void;
+}
+
+const Header = ({ user, logout }: HeaderProps) => {
     return (
         <AppBar 
             position="static" 
             sx={{ 
                 backgroundColor: '#fbedde',
                 boxShadow: 'none', 
-                padding: '16px 20px' // Добавляем горизонтальный padding в Header, чтобы избежать прилипания
+                padding: '16px 0' 
             }}
         >
-            {/* Оставляем Container в хедере, чтобы логотип был центрирован как раньше */}
-            <Container maxWidth="lg">
-                <Toolbar disableGutters>
-                    <Box sx={{ flexGrow: 1 }}>
-                        <img 
-                            src="/logo.png" 
-                            alt="Logo" 
-                            style={{ height: '40px' }} 
-                        />
-                    </Box>
-                </Toolbar>
-            </Container>
+            <Toolbar disableGutters sx={{ padding: '0 20px' }}> 
+                <Box sx={{ flexGrow: 1 }}>
+                    <img 
+                        src="/logo.png" 
+                        alt="Logo" 
+                        style={{ height: '60px' }} 
+                    />
+                </Box>
+                {user?.isAuthenticated && (
+                    <Button 
+                        variant="contained" 
+                        color="secondary"
+                        onClick={logout}
+                    >
+                        Log out
+                    </Button>
+                )}
+            </Toolbar>
         </AppBar>
     );
 };
@@ -64,15 +73,14 @@ const Main: React.FC<{}> = ({}) => {
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <BrowserRouter>
-                <Header /> 
+                <Header user={user} logout={logout} /> 
                 
-                {/* ИСПРАВЛЕНИЕ: Удален внешний Container. Добавлен padding, чтобы контент не прилипал к краям. */}
                 <Box id="content-wrapper" sx={{ padding: '0 20px' }}> 
                     <Box id="content-container" sx={{ margin: '0' }}> 
                         <UserContext.Provider value={{user, setUser}}>
                             <AuthGuard>
                                 <Routes>
-                                    <Route path="/" element={<Tasks logout={logout} user={user} />}/>
+                                    <Route path="/" element={<Tasks user={user} />}/> 
                                     <Route path="/login" element={<AuthPage isRegistration={false} />}/>
                                     <Route path="/register" element={<AuthPage isRegistration={true} />}/>
                                 </Routes>

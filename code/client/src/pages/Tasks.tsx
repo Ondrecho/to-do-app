@@ -1,5 +1,3 @@
-// src/pages/Tasks.tsx
-
 import { Checkbox, Box, Button, Card, CardActions, CardContent, IconButton, TextField, Typography } from "@mui/material"
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Fragment, useEffect, useState, FC, useContext } from "react";
@@ -57,7 +55,7 @@ const Form: FC<{
     const createHandle = async () => {
         try {
             const { data: newTask } = await method.task.create({
-                id: 0, // ИСПРАВЛЕНИЕ: Добавлен временный ID для соответствия типу Task
+                id: 0,
                 userId,
                 title: formData.title,
                 description: formData.description,
@@ -153,7 +151,8 @@ const Form: FC<{
 }
 
 
-const Tasks: FC<{ logout: () => void, user: User }> = ({ logout, user }) => {
+// УДАЛЕН ПРОП logout
+const Tasks: FC<{ user: User }> = ({ user }) => {
     const [tasksList, setTasksList] = useState<Task[]>([])
     const [isEditing, setIsEditing] = useState<boolean>(false)
     const [isCreating, setIsCreating] = useState<boolean>(false)
@@ -220,20 +219,18 @@ const Tasks: FC<{ logout: () => void, user: User }> = ({ logout, user }) => {
 
 
     return (<Fragment>
-
+        
         <Box 
             sx={{
-
                 position: 'fixed',
                 top: 0,
                 left: 0,
                 width: '100%',
                 height: '100%',
-                zIndex: -1, // Отправляем фон назад
+                zIndex: -1, 
                 
-                // Стилизация фона
-                backgroundImage: 'url(/background.jpg)', 
-                backgroundSize: 'cover', // Растягивает фото
+                backgroundImage: 'url(/background.png)', 
+                backgroundSize: 'cover', 
                 backgroundPosition: 'center',
                 backgroundAttachment: 'fixed',
             }}
@@ -245,13 +242,7 @@ const Tasks: FC<{ logout: () => void, user: User }> = ({ logout, user }) => {
                  <Typography variant="h4" gutterBottom>
                     To Do List
                 </Typography>
-                <Button 
-                    variant="contained" 
-                    color="secondary"
-                    onClick={logout}
-                >
-                    Log out
-                </Button>
+                {/* КНОПКА LOG OUT УДАЛЕНА ИЗ ТЕЛА */}
             </Box>
         
             <Box sx={{ marginBottom: "50px" }}>
@@ -273,61 +264,89 @@ const Tasks: FC<{ logout: () => void, user: User }> = ({ logout, user }) => {
                 </Button>
             </Box>
             
+            {/* НОВЫЙ GRID LAYOUT для Aside и Списка Задач */}
             <Box 
             sx={{
                 display: "grid", 
-                gridTemplateColumns: "1fr 1fr 1fr", 
+                gridTemplateColumns: "250px 1fr", // 250px для Aside, остальное для задач
                 gap: "20px",
 
                 "@media screen and (max-width: 991px)": {
-                    gridTemplateColumns: "1fr 1fr", 
-                },
-                "@media screen and (max-width: 767px)": {
-                    display: "flex",
-                    flexDirection: "column", 
+                    gridTemplateColumns: "1fr", // На маленьких экранах: 1 колонка
                 }
             }}>
-                {tasksList.map(task => {
-                    return (
-                        <Card 
-                            key={task.id}
-                            sx={{
-                                gridColumn: gridSize(task.description.length), 
-                                display: "flex", 
-                                flexDirection: "column", 
-                                justifyContent: "space-between",
-                                borderRadius: 3,
-                                backgroundColor: task.isImportant ? "#2d2d48" : "#1e1e1e",
-                                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)',
-                            }}
-                        >
-                            <CardContent>
-                                <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                    {formatDate(task.createdAt)}
-                                </Typography>
-                                <Typography variant="h5" component="div" sx={{ margin: "10px 0", fontWeight: 700 }}>
-                                    {task.title}
-                                </Typography>
-                                <Typography variant="body2">
-                                    {task.description}
-                                </Typography>
-                            </CardContent>
-                            <CardActions sx={{ backgroundColor: '#121212' }}>
-                                <IconButton 
-                                    onClick={() => {
-                                        setCurrentTask(task)
-                                        setIsEditing(true)
-                                    }}
-                                >
-                                    <EditIcon color="primary" />
-                                </IconButton>
-                                <IconButton onClick={() => deleteHandle(task.id)}>
-                                    <DeleteIcon sx={{ color: "#e04848" }}/>
-                                </IconButton>
-                            </CardActions>
-                        </Card>
-                    )
-                })}
+                
+                {/* ASIDE (Сайдбар) */}
+                <Box
+                    component="aside"
+                    sx={{
+                        backgroundColor: '#edd2c4', // Заданный цвет
+                        padding: '20px',
+                        borderRadius: 3,
+                        '@media screen and (max-width: 991px)': {
+                            order: 1, // Aside сверху на мобильных
+                        },
+                    }}
+                >
+                    <Typography variant="h6" sx={{ color: '#1e1e1e', marginBottom: '10px' }}>Filters</Typography>
+                    <Typography variant="body1" sx={{ color: '#555' }}>
+                        * Filter options will go here *
+                    </Typography>
+                </Box>
+                
+                {/* TASK LIST CONTAINER */}
+                <Box
+                    sx={{
+                        display: "grid", 
+                        gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", 
+                        gap: "20px",
+                        '@media screen and (max-width: 991px)': {
+                            order: 2, // Задачи снизу на мобильных
+                        },
+                    }}
+                >
+                    {tasksList.map(task => {
+                        return (
+                            <Card 
+                                key={task.id}
+                                sx={{
+                                    gridColumn: gridSize(task.description.length), 
+                                    display: "flex", 
+                                    flexDirection: "column", 
+                                    justifyContent: "space-between",
+                                    borderRadius: 3,
+                                    backgroundColor: task.isImportant ? "#2d2d48" : "#1e1e1e",
+                                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)',
+                                }}
+                            >
+                                <CardContent>
+                                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                                        {formatDate(task.createdAt)}
+                                    </Typography>
+                                    <Typography variant="h5" component="div" sx={{ margin: "10px 0", fontWeight: 700 }}>
+                                        {task.title}
+                                    </Typography>
+                                    <Typography variant="body2">
+                                        {task.description}
+                                    </Typography>
+                                </CardContent>
+                                <CardActions sx={{ backgroundColor: '#121212' }}>
+                                    <IconButton 
+                                        onClick={() => {
+                                            setCurrentTask(task)
+                                            setIsEditing(true)
+                                        }}
+                                    >
+                                        <EditIcon color="primary" />
+                                    </IconButton>
+                                    <IconButton onClick={() => deleteHandle(task.id)}>
+                                        <DeleteIcon sx={{ color: "#e04848" }}/>
+                                    </IconButton>
+                                </CardActions>
+                            </Card>
+                        )
+                    })}
+                </Box>
             </Box>
         </Box>
 
