@@ -36,7 +36,6 @@ const createMockResponse = <T>(data: T): AxiosResponse<T> => ({
     config: {} as any
 });
 
-
 export const method = {
     user: {
         login(data: AuthParams): Promise<AxiosResponse<LoginAnswer>> { 

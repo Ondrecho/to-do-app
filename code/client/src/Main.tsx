@@ -1,22 +1,57 @@
+// src/Main.tsx
+
 import React, { useMemo } from "react"
-import { ThemeProvider, Typography, Box, Container } from "@mui/material"
-import { theme } from "./theme/createTheme"
+// Исправлено: Все импорты MUI объединены
+import { ThemeProvider, Typography, Box, Container, AppBar, Toolbar } from "@mui/material"
 import AuthPage from "./pages/AuthPage"
-import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom"
+// Исправлено: Добавлен useLocation
+import { BrowserRouter, Route, Routes, useNavigate, useLocation } from "react-router-dom" 
 import AuthGuard from "./components/utilities/AuthGuard"
 import Tasks from "./pages/Tasks"
 import CssBaseline from "@mui/material/CssBaseline";
-import { User } from './api/types';
+// Исправлено: Консолидированный импорт типов
+import { User, UserContextType } from './api/types'; 
+// Исправлено: Путь к теме теперь './theme/theme', как указано в структуре файлов
+import { theme } from './theme/theme'; 
 
-type UserContextType = {
-    user: User | null
-    setUser: React.Dispatch<React.SetStateAction<User | null>>
-}
+export const UserContext = React.createContext<UserContextType | null>(null);
 
-export const UserContext = React.createContext<UserContextType>(null)
+const Header = () => {
+    // Исправлено: useLocation теперь доступен
+    const location = useLocation();
+
+    if (location.pathname === '/login' || location.pathname === '/register') {
+        return null;
+    }
+
+    return (
+        <AppBar 
+            position="static" 
+            sx={{ 
+                backgroundColor: 'transparent', 
+                boxShadow: 'none', 
+                padding: '16px 0' 
+            }}
+        >
+            <Container maxWidth="lg">
+                <Toolbar disableGutters>
+                    <Box sx={{ flexGrow: 1 }}>
+                        <img 
+                            src="/logo.png" 
+                            alt="Logo" 
+                            style={{ height: '40px' }} 
+                        />
+                    </Box>
+                </Toolbar>
+            </Container>
+        </AppBar>
+    );
+};
+
 
 const Main: React.FC<{}> = ({}) => {
 
+    // Функция logout
     const logout = () => {
         localStorage.removeItem("token")
         setUser({
@@ -27,31 +62,38 @@ const Main: React.FC<{}> = ({}) => {
         })
     }
 
-    const [user, setUser] = React.useState<User | null>({
-        id: 0,
-        username: "",
-        password: "",
-        isAuthenticated: false,
+    // Состояние пользователя
+    const [user, setUser] = React.useState<User | null>(() => {
+        return {
+            id: 0,
+            username: "",
+            password: "",
+            isAuthenticated: false,
+        }
     })
 
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <Container maxWidth="lg">
-                <Box id="comment" sx={{margin: "100px 0 50px"}}>
-                    <UserContext.Provider value={{user, setUser}}>
-                        <BrowserRouter>
-                            <AuthGuard>
-                                <Routes>
-                                    <Route path="/" element={<Tasks logout={logout} user={user} />}/>
-                                    <Route path="/login" element={<AuthPage isRegistration={false} />}/>
-                                    <Route path="/register" element={<AuthPage isRegistration={true} />}/>
-                                </Routes>
-                            </AuthGuard>
-                        </BrowserRouter>
-                    </UserContext.Provider>
+            <BrowserRouter>
+                <Header /> 
+                
+                <Box id="content-wrapper"> 
+                    <Container maxWidth="lg"> 
+                        <Box id="content-container" sx={{ margin: '0' }}> 
+                            <UserContext.Provider value={{user, setUser}}>
+                                <AuthGuard>
+                                    <Routes>
+                                        <Route path="/" element={<Tasks logout={logout} user={user} />}/>
+                                        <Route path="/login" element={<AuthPage isRegistration={false} />}/>
+                                        <Route path="/register" element={<AuthPage isRegistration={true} />}/>
+                                    </Routes>
+                                </AuthGuard>
+                            </UserContext.Provider>
+                        </Box>
+                    </Container>
                 </Box>
-            </Container>
+            </BrowserRouter>
         </ThemeProvider>
     )
 }

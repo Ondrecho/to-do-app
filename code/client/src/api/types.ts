@@ -1,4 +1,3 @@
-
 export type AuthParams = {
     username: string,
     password: string
@@ -25,3 +24,8 @@ export type Task = {
     createdAt?: Date,
     isImportant?: boolean
 }
+
+export type UserContextType = {
+    user: User | null;
+    setUser: React.Dispatch<React.SetStateAction<User | null>>;
+};
