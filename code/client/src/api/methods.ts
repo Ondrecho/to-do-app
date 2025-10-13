@@ -22,10 +22,14 @@ const MOCK_USER: User = {
     isAuthenticated: true,
 }
 
+const NOW_ISO = new Date().toISOString();
+const YESTERDAY_ISO = new Date(Date.now() - 86400000).toISOString();
+const HOUR_AGO_ISO = new Date(Date.now() - 3600000).toISOString();
+
 const MOCK_TASKS: Task[] = [
-    {id: 101, userId: 1, title: "Мокирование завершено", description: "Успешно мокировать все обращения к API для обхода проблем с CORS и TS.", isImportant: true},
-    {id: 102, userId: 1, title: "Протестировать роутинг", description: "Проверить, что фронтенд корректно переходит между страницами /login, /register и /.", isImportant: false},
-    {id: 103, userId: 1, title: "Настроить Nginx", description: "Вернуться к настройке Nginx Reverse Proxy после завершения работы над фронтом.", isImportant: false}
+    {id: 101, userId: 1, title: "Мокирование завершено", description: "Успешно мокировать все обращения к API для обхода проблем с CORS и TS.", isImportant: true, createdAt: NOW_ISO},
+    {id: 102, userId: 1, title: "Протестировать роутинг", description: "Проверить, что фронтенд корректно переходит между страницами /login, /register и /.", isImportant: false, createdAt: YESTERDAY_ISO},
+    {id: 103, userId: 1, title: "Настроить Nginx", description: "Вернуться к настройке Nginx Reverse Proxy после завершения работы над фронтом.", isImportant: false, createdAt: HOUR_AGO_ISO}
 ]
 
 const createMockResponse = <T>(data: T): AxiosResponse<T> => ({
@@ -88,7 +92,7 @@ export const method = {
         },
         create(data: Task): Promise<AxiosResponse<Task>> {
             console.log(`MOCK: Creating task: ${data.title}`)
-            const newTask: Task = {...data, id: Date.now(), userId: MOCK_USER.id}
+            const newTask: Task = {...data, id: Date.now(), userId: MOCK_USER.id, createdAt: new Date().toISOString()}
             return new Promise((resolve) => {
                 setTimeout(() => {
                     resolve(createMockResponse(newTask))

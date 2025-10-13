@@ -57,6 +57,7 @@ const Form: FC<{
     const createHandle = async () => {
         try {
             const { data: newTask } = await method.task.create({
+                id: 0, // ИСПРАВЛЕНИЕ: Добавлен временный ID для соответствия типу Task
                 userId,
                 title: formData.title,
                 description: formData.description,
@@ -205,33 +206,41 @@ const Tasks: FC<{ logout: () => void, user: User }> = ({ logout, user }) => {
         return "span 1";
     }
 
-    // Вспомогательная функция для форматирования даты
     const formatDate = (date: Date | string | undefined): string => {
         if (!date) return 'N/A';
         try {
-            // Если приходит строка (например, с сервера), преобразуем
             const dateObj = typeof date === 'string' ? new Date(date) : date;
+            // Проверка на корректность даты
+            if (isNaN(dateObj.getTime())) return 'Invalid Date';
             return dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString();
         } catch (e) {
-            console.error("Error formatting date:", e);
             return 'Invalid Date';
         }
     };
 
 
     return (<Fragment>
-        
+
         <Box 
             sx={{
-                backgroundImage: 'url(/background.png)', 
-                backgroundSize: 'cover',
+
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                zIndex: -1, // Отправляем фон назад
+                
+                // Стилизация фона
+                backgroundImage: 'url(/background.jpg)', 
+                backgroundSize: 'cover', // Растягивает фото
                 backgroundPosition: 'center',
-                backgroundAttachment: 'fixed', 
-                minHeight: 'calc(100vh - 80px)', 
-                padding: '20px', 
+                backgroundAttachment: 'fixed',
             }}
         >
+        </Box>
         
+        <Box sx={{ paddingTop: '20px' }}>
             <Box sx={{mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                  <Typography variant="h4" gutterBottom>
                     To Do List
@@ -294,7 +303,7 @@ const Tasks: FC<{ logout: () => void, user: User }> = ({ logout, user }) => {
                         >
                             <CardContent>
                                 <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                    {formatDate(task.createdAt)} {/* ИСПРАВЛЕНО: Используем formatDate */}
+                                    {formatDate(task.createdAt)}
                                 </Typography>
                                 <Typography variant="h5" component="div" sx={{ margin: "10px 0", fontWeight: 700 }}>
                                     {task.title}
@@ -320,7 +329,7 @@ const Tasks: FC<{ logout: () => void, user: User }> = ({ logout, user }) => {
                     )
                 })}
             </Box>
-        </Box> 
+        </Box>
 
 
         <ModalComponent isOpen={isCreating || isEditing} setIsOpen={isCreating ? setIsCreating : setIsEditing}>

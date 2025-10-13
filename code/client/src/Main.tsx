@@ -13,16 +13,16 @@ import { theme } from './theme/theme';
 export const UserContext = React.createContext<UserContextType | null>(null);
 
 const Header = () => {
-    // Хедер отображается везде, логика скрытия удалена
     return (
         <AppBar 
             position="static" 
             sx={{ 
-                backgroundColor: '#fbedde', // Установлен цвет fbedde
+                backgroundColor: '#fbedde',
                 boxShadow: 'none', 
-                padding: '16px 0' 
+                padding: '16px 20px' // Добавляем горизонтальный padding в Header, чтобы избежать прилипания
             }}
         >
+            {/* Оставляем Container в хедере, чтобы логотип был центрирован как раньше */}
             <Container maxWidth="lg">
                 <Toolbar disableGutters>
                     <Box sx={{ flexGrow: 1 }}>
@@ -66,20 +66,19 @@ const Main: React.FC<{}> = ({}) => {
             <BrowserRouter>
                 <Header /> 
                 
-                <Box id="content-wrapper"> 
-                    <Container maxWidth="lg"> 
-                        <Box id="content-container" sx={{ margin: '0' }}> 
-                            <UserContext.Provider value={{user, setUser}}>
-                                <AuthGuard>
-                                    <Routes>
-                                        <Route path="/" element={<Tasks logout={logout} user={user} />}/>
-                                        <Route path="/login" element={<AuthPage isRegistration={false} />}/>
-                                        <Route path="/register" element={<AuthPage isRegistration={true} />}/>
-                                    </Routes>
-                                </AuthGuard>
-                            </UserContext.Provider>
-                        </Box>
-                    </Container>
+                {/* ИСПРАВЛЕНИЕ: Удален внешний Container. Добавлен padding, чтобы контент не прилипал к краям. */}
+                <Box id="content-wrapper" sx={{ padding: '0 20px' }}> 
+                    <Box id="content-container" sx={{ margin: '0' }}> 
+                        <UserContext.Provider value={{user, setUser}}>
+                            <AuthGuard>
+                                <Routes>
+                                    <Route path="/" element={<Tasks logout={logout} user={user} />}/>
+                                    <Route path="/login" element={<AuthPage isRegistration={false} />}/>
+                                    <Route path="/register" element={<AuthPage isRegistration={true} />}/>
+                                </Routes>
+                            </AuthGuard>
+                        </UserContext.Provider>
+                    </Box>
                 </Box>
             </BrowserRouter>
         </ThemeProvider>

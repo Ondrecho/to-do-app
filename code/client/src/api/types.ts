@@ -17,12 +17,12 @@ export type User = {
 }
 
 export type Task = {
-    id?: number,
-    userId?: number,
+    id: number,
+    userId: number,
     title: string,
     description: string,
-    createdAt?: Date,
-    isImportant?: boolean
+    isImportant: boolean,
+    createdAt: Date | string
 }
 
 export type UserContextType = {
