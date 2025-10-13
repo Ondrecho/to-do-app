@@ -1,4 +1,5 @@
 version: '3.8'
+
 services:
   db:
     image: postgres:15
@@ -28,16 +29,15 @@ services:
       - DATABASE_USER=postgres
       - DATABASE_PASSWORD=postgres
       - JWT_SECRET=superVeryLongSecretKeyThatIsAtLeast32CharactersLong
-    volumes:
-      - ./code/server/docker/wait-for-postgres.sh:/wait-for-postgres.sh:ro
-    command: ["sh", "-c", "/wait-for-postgres.sh db 5432 && java -jar /app/app.jar"]
     ports:
       - "5001:5001"
 
   client:
-    build: ./code/client 
+    build: ./code/client
     ports:
       - "9000:80"
+    depends_on:
+      - server
 
 volumes:
   db-data:
