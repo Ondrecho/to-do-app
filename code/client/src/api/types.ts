@@ -1,3 +1,7 @@
+// src/api/types.ts
+
+import React from "react"
+
 export type AuthParams = {
     username: string,
     password: string
@@ -22,10 +26,11 @@ export type Task = {
     title: string,
     description: string,
     isImportant: boolean,
+    isDone: boolean, // <-- ИСПРАВЛЕНО: Добавлено обязательное поле
     createdAt: Date | string
 }
 
-export type UserContextType = {
+export type UserContextType = { // <-- ИСПРАВЛЕНО: Экспортировано
     user: User | null;
     setUser: React.Dispatch<React.SetStateAction<User | null>>;
 };

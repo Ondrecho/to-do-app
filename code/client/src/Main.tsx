@@ -1,10 +1,12 @@
-import React, { useMemo } from "react"
+// src/Main.tsx
+
+import React from "react"
 import { ThemeProvider, Typography, Box, Container, AppBar, Toolbar, CssBaseline, Button } from "@mui/material"
 import AuthPage from "./pages/AuthPage"
-import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom"
+import { BrowserRouter, Route, Routes } from "react-router-dom"
 import AuthGuard from "./components/utilities/AuthGuard"
 import Tasks from "./pages/Tasks"
-import { User, UserContextType } from './api/types';
+import { User, UserContextType } from './api/types'; // <-- ИСПРАВЛЕНО: Корректный импорт
 import { theme } from './theme/theme';
 
 
@@ -50,6 +52,15 @@ const Header = ({ user, logout }: HeaderProps) => {
 
 const Main: React.FC<{}> = ({}) => {
 
+    const [user, setUser] = React.useState<User | null>(() => {
+        return {
+            id: 0,
+            username: "",
+            password: "",
+            isAuthenticated: false,
+        }
+    })
+
     const logout = () => {
         localStorage.removeItem("token")
         setUser({
@@ -60,14 +71,6 @@ const Main: React.FC<{}> = ({}) => {
         })
     }
 
-    const [user, setUser] = React.useState<User | null>(() => {
-        return {
-            id: 0,
-            username: "",
-            password: "",
-            isAuthenticated: false,
-        }
-    })
 
     return (
         <ThemeProvider theme={theme}>

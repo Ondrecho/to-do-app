@@ -6,12 +6,13 @@ import { Fragment, useEffect, useState, FC, useContext } from "react";
 import { method } from "../api/methods";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import DoneIcon from '@mui/icons-material/Done'; // <-- Добавлена иконка
 import ModalComponent from "../components/utilities/Modal";
 import AlertComponent, { AlertTypes, AlertStateType } from "../components/utilities/Alert";
 import DateSelect from "../components/utilities/DateSelect";
 import { UserContext } from "../Main";
-import { User, Task, UserContextType } from '../api/types';
-import AddIcon from '@mui/icons-material/Add'; // Импортируем иконку плюса
+import { User, Task, UserContextType } from '../api/types'; // <-- ИСПРАВЛЕНО: Корректный импорт
+import AddIcon from '@mui/icons-material/Add'; 
 
 const Form: FC<{
     isCreating: boolean,
@@ -34,7 +35,8 @@ const Form: FC<{
         description: currentTask.description || "",
         userId: user.id,
         createdAt: currentTask.createdAt || new Date(),
-        isImportant: currentTask.isImportant || false
+        isImportant: currentTask.isImportant || false,
+        isDone: currentTask.isDone || false // <-- ДОБАВЛЕНО
     })
 
     const handleFormChange = (field: keyof Task, value: any) => {
@@ -63,7 +65,8 @@ const Form: FC<{
                 title: formData.title,
                 description: formData.description,
                 createdAt: formData.createdAt,
-                isImportant: formData.isImportant
+                isImportant: formData.isImportant,
+                isDone: false // <-- ДОБАВЛЕНО
             });
 
             setTasksList(prev => [...prev, newTask])
@@ -165,7 +168,8 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
         description: "",
         userId: user.id,
         createdAt: new Date(),
-        isImportant: false
+        isImportant: false,
+        isDone: false // <-- ДОБАВЛЕНО
     })
 
     const [error, setError] = useState<AlertStateType>({
@@ -201,6 +205,26 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
         }
     }
     
+    // ФУНКЦИЯ: для переключения isDone
+    const handleDone = async (taskToToggle: Task) => {
+        const updatedTask: Task = {
+            ...taskToToggle,
+            isDone: !taskToToggle.isDone
+        };
+        
+        try {
+            const { data } = await method.task.update(updatedTask);
+            
+            setTasksList(prev => prev.map(task => 
+                task.id === updatedTask.id ? data : task
+            ));
+        } catch (error) {
+            console.error("Error updating task status:", error);
+            const errorMessage = error.response?.data?.Message ?? "Failed to update task status.";
+            setError({ message: errorMessage, isVisible: true });
+        }
+    };
+
     const gridSize = (textLength: number) => {
         if (textLength > 450) return "span 3";
         if (textLength > 50) return "span 2";
@@ -226,7 +250,8 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
             description: "",
             userId: user.id,
             createdAt: new Date(),
-            isImportant: false
+            isImportant: false,
+            isDone: false // <-- ДОБАВЛЕНО
         })
         setIsCreating(true)
     }
@@ -252,13 +277,13 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
         >
         </Box>
 
-        {/* ПЛАВАЮЩАЯ КНОПКА CREATE TASK: Теперь fixed и находится в Fragment */}
+        {/* ПЛАВАЮЩАЯ КНОПКА CREATE TASK */}
         <Box
             sx={{
-                position: 'fixed', // Делаем кнопку фиксированной
+                position: 'fixed', 
                 bottom: '30px',
                 right: '30px',
-                zIndex: 100, // Устанавливаем высокий zIndex, чтобы она была над всем
+                zIndex: 100, 
             }}
         >
             <Button 
@@ -279,14 +304,12 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
         
         {/* ОСНОВНОЕ СОДЕРЖИМОЕ */}
         <Box sx={{ paddingTop: '20px' }}>
-            {/* УДАЛЕН БЛОК <h4 class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1vw6mcs-MuiTypography-root">To Do List</h4> */}
             
             
             {/* ГЛАВНЫЙ КОНТЕЙНЕР: Grid для Aside и Списка Задач */}
             <Box 
             sx={{
                 display: "grid", 
-                // Устанавливаем минимальную высоту, чтобы Aside мог растянуться
                 minHeight: 'calc(100vh - 100px)', 
                 gridTemplateColumns: "250px 1fr", 
                 gap: "20px",
@@ -303,7 +326,6 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
                         backgroundColor: '#edd2c4', 
                         padding: '20px',
                         borderRadius: 3,
-                        // Гарантируем, что aside растянется на всю высоту в Grid-контейнере
                         minHeight: '100%',
                         
                         '@media screen and (max-width: 991px)': {
@@ -322,7 +344,6 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
                     sx={{
                         display: 'flex',
                         flexDirection: 'column',
-                        // Убрано position: 'relative'
                         minHeight: '100%', 
                         '@media screen and (max-width: 991px)': {
                             order: 2,
@@ -335,10 +356,12 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
                             display: "grid", 
                             gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", 
                             gap: "20px",
-                            paddingBottom: '20px', // Небольшой отступ в конце списка
+                            paddingBottom: '20px',
                         }}
                     >
                         {tasksList.map(task => {
+                            const isTaskDone = task.isDone;
+                            
                             return (
                                 <Card 
                                     key={task.id}
@@ -350,20 +373,48 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
                                         borderRadius: 3,
                                         backgroundColor: task.isImportant ? "#2d2d48" : "#1e1e1e",
                                         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)',
+                                        opacity: isTaskDone ? 0.7 : 1, // Визуальный эффект
                                     }}
                                 >
                                     <CardContent>
                                         <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
                                             {formatDate(task.createdAt)}
                                         </Typography>
-                                        <Typography variant="h5" component="div" sx={{ margin: "10px 0", fontWeight: 700 }}>
+                                        
+                                        {/* Заголовок */}
+                                        <Typography 
+                                            variant="h5" 
+                                            component="div" 
+                                            sx={{ 
+                                                margin: "10px 0", 
+                                                fontWeight: 700,
+                                                textDecoration: isTaskDone ? 'line-through' : 'none', // Зачеркивание
+                                                color: isTaskDone ? '#888' : 'white',
+                                            }}
+                                        >
                                             {task.title}
                                         </Typography>
-                                        <Typography variant="body2">
+                                        
+                                        {/* Описание */}
+                                        <Typography 
+                                            variant="body2"
+                                            sx={{
+                                                textDecoration: isTaskDone ? 'line-through' : 'none', 
+                                                color: isTaskDone ? '#888' : 'white',
+                                            }}
+                                        >
                                             {task.description}
                                         </Typography>
                                     </CardContent>
                                     <CardActions sx={{ backgroundColor: '#121212' }}>
+                                        
+                                        {/* КНОПКА ГАЛОЧКИ */}
+                                        <IconButton 
+                                            onClick={() => handleDone(task)}
+                                        >
+                                            <DoneIcon color={isTaskDone ? 'success' : 'action'} />
+                                        </IconButton>
+
                                         <IconButton 
                                             onClick={() => {
                                                 setCurrentTask(task)
