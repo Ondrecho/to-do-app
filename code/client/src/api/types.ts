@@ -4,8 +4,8 @@ type AuthParams = {
 }
 
 type LoginAnswer = {
-    user: User,
-    token: string
+    token: string,
+    user: User
 }
 
 type User = {

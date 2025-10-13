@@ -12,7 +12,6 @@ public class TaskDto {
     private OffsetDateTime createdAt;
     private Long userId;
 
-    // getters/setters
     @Schema(description = "Task id")
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

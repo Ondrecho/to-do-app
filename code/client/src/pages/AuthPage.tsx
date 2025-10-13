@@ -34,51 +34,42 @@ const Page: React.FC<{isRegistration: boolean}> = ({isRegistration}) => {
         validationSchema,
         onSubmit: async (values, helpers): Promise<void> => {
             try {
-                if(isRegistration) {
-                    const {data} = await method.user.register({
-                        username: values.username,
-                        password: values.password
-                    });
+                let data;
 
-                    helpers.setStatus({success: true});
-                    localStorage.setItem("token", data.token);
-
-                    console.log(data)
-                    setUser({...data})
-
-                    setTimeout(() => {
-                        navigate("/")
-                    }, 200)
+                if (isRegistration) {
+                ({ data } = await method.user.register({
+                    username: values.username,
+                    password: values.password,
+                }));
+                } else {
+                ({ data } = await method.user.login({
+                    username: values.username,
+                    password: values.password,
+                }));
                 }
-                else {
-                    const {data} = await method.user.login({
-                       username: values.username, 
-                       password: values.password
-                    });
 
-                    helpers.setStatus({success: true});
-                    localStorage.setItem("token", data.token);
+                helpers.setStatus({ success: true });
+                localStorage.setItem("token", data.token);
 
-                    setUser({
-                        isAuthenticated: true,
-                        username: data.user.username,
-                        password: data.user.password,
-                        id: data.user.id,
-                    })
+                setUser({
+                isAuthenticated: true,
+                username: data.user.username,   // теперь всегда через data.user
+                id: data.user.id,
+                password: data.user.password,   // если нужно хранить (обычно не рекомендуется)
+                });
 
-                    setTimeout(() => {
-                        navigate("/")
-                    }, 200)
-                }
-            } 
-            catch (err) {
+                setTimeout(() => {
+                navigate("/");
+                }, 200);
+            } catch (err: any) {
                 console.error(err);
-                helpers.setStatus({success: false});
+                helpers.setStatus({ success: false });
                 formik.setErrors({
-                    submit: err.response.data.error
+                submit: err.response?.data?.error,
                 });
             }
         },
+
     });
 
 

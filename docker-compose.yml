@@ -27,7 +27,7 @@ services:
       - DATABASE_URL=jdbc:postgresql://db:5432/todo
       - DATABASE_USER=postgres
       - DATABASE_PASSWORD=postgres
-      - JWT_SECRET=changeit-secret-for-dev
+      - JWT_SECRET=superVeryLongSecretKeyThatIsAtLeast32CharactersLong
     volumes:
       - ./code/server/docker/wait-for-postgres.sh:/wait-for-postgres.sh:ro
     command: ["sh", "-c", "/wait-for-postgres.sh db 5432 && java -jar /app/app.jar"]
@@ -35,7 +35,7 @@ services:
       - "5001:5001"
 
   client:
-    image: my-frontend
+    build: ./code/client 
     ports:
       - "9000:80"
 
