@@ -1,19 +1,23 @@
 // src/pages/Tasks.tsx
 
-import { Checkbox, Box, Button, Card, CardActions, CardContent, IconButton, TextField, Typography } from "@mui/material"
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Checkbox, Box, Button, Card, CardActions, CardContent, IconButton, TextField, Typography, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material"
 import { Fragment, useEffect, useState, FC, useContext } from "react";
 import { method } from "../api/methods";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import DoneIcon from '@mui/icons-material/Done'; // <-- Добавлена иконка
+import DoneIcon from '@mui/icons-material/Done'; 
+import PushPinIcon from '@mui/icons-material/PushPin'; // <-- Иконка для All Tasks
+import StarIcon from '@mui/icons-material/Star'; // <-- Иконка для Important
 import ModalComponent from "../components/utilities/Modal";
 import AlertComponent, { AlertTypes, AlertStateType } from "../components/utilities/Alert";
 import DateSelect from "../components/utilities/DateSelect";
 import { UserContext } from "../Main";
-import { User, Task, UserContextType } from '../api/types'; // <-- ИСПРАВЛЕНО: Корректный импорт
+// Импорт TaskFilter
+import { User, Task, UserContextType, TaskFilter } from '../api/types'; 
 import AddIcon from '@mui/icons-material/Add'; 
 
+
+// Форма (оставлена без изменений, кроме isDone)
 const Form: FC<{
     isCreating: boolean,
     setError: React.Dispatch<React.SetStateAction<AlertStateType>>
@@ -36,7 +40,7 @@ const Form: FC<{
         userId: user.id,
         createdAt: currentTask.createdAt || new Date(),
         isImportant: currentTask.isImportant || false,
-        isDone: currentTask.isDone || false // <-- ДОБАВЛЕНО
+        isDone: currentTask.isDone || false 
     })
 
     const handleFormChange = (field: keyof Task, value: any) => {
@@ -66,7 +70,7 @@ const Form: FC<{
                 description: formData.description,
                 createdAt: formData.createdAt,
                 isImportant: formData.isImportant,
-                isDone: false // <-- ДОБАВЛЕНО
+                isDone: false 
             });
 
             setTasksList(prev => [...prev, newTask])
@@ -157,10 +161,66 @@ const Form: FC<{
 }
 
 
+const Aside: FC<{
+    currentFilter: TaskFilter,
+    setCurrentFilter: React.Dispatch<React.SetStateAction<TaskFilter>>
+}> = ({ currentFilter, setCurrentFilter }) => {
+    
+    const filters: { label: string, filter: TaskFilter, icon: JSX.Element }[] = [
+        { label: "Tasks", filter: "all", icon: <PushPinIcon /> },
+        { label: "Important", filter: "important", icon: <StarIcon /> },
+        { label: "Completed", filter: "completed", icon: <DoneIcon /> },
+    ];
+
+    return (
+        <Box
+            component="aside"
+            sx={{
+                backgroundColor: '#edd2c4', 
+                padding: '20px',
+                borderRadius: 3,
+                minHeight: '100%', 
+                
+                '@media screen and (max-width: 991px)': {
+                    order: 1,
+                },
+            }}
+        >
+            <Typography variant="h6" sx={{ color: '#1e1e1e', marginBottom: '10px' }}>Filters</Typography>
+            <List>
+                {filters.map(({ label, filter, icon }) => (
+                    <ListItem key={filter} disablePadding>
+                        <ListItemButton
+                            onClick={() => setCurrentFilter(filter)}
+                            selected={currentFilter === filter}
+                            sx={{
+                                borderRadius: 2,
+                                '&.Mui-selected': {
+                                    backgroundColor: '#e6c3af', // Выделенный цвет
+                                    '&:hover': {
+                                        backgroundColor: '#e6c3af',
+                                    }
+                                }
+                            }}
+                        >
+                            <ListItemIcon sx={{ minWidth: 35 }}>
+                                {icon}
+                            </ListItemIcon>
+                            <ListItemText primary={label} primaryTypographyProps={{ fontWeight: currentFilter === filter ? 'bold' : 'normal' }} />
+                        </ListItemButton>
+                    </ListItem>
+                ))}
+            </List>
+        </Box>
+    );
+};
+
+
 const Tasks: FC<{ user: User }> = ({ user }) => {
     const [tasksList, setTasksList] = useState<Task[]>([])
     const [isEditing, setIsEditing] = useState<boolean>(false)
     const [isCreating, setIsCreating] = useState<boolean>(false)
+    const [currentFilter, setCurrentFilter] = useState<TaskFilter>('all') // <-- ДОБАВЛЕНО: Состояние фильтра
 
     const [currentTask, setCurrentTask] = useState<Task>({
         id: 0,
@@ -169,7 +229,7 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
         userId: user.id,
         createdAt: new Date(),
         isImportant: false,
-        isDone: false // <-- ДОБАВЛЕНО
+        isDone: false 
     })
 
     const [error, setError] = useState<AlertStateType>({
@@ -205,7 +265,6 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
         }
     }
     
-    // ФУНКЦИЯ: для переключения isDone
     const handleDone = async (taskToToggle: Task) => {
         const updatedTask: Task = {
             ...taskToToggle,
@@ -224,6 +283,24 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
             setError({ message: errorMessage, isVisible: true });
         }
     };
+
+    // <-- ДОБАВЛЕНО: Логика фильтрации
+    const getFilteredTasks = (): Task[] => {
+        switch (currentFilter) {
+            case 'important':
+                return tasksList.filter(task => task.isImportant && !task.isDone);
+            case 'completed':
+                return tasksList.filter(task => task.isDone);
+            case 'all':
+            default:
+                // Показываем все невыполненные задачи, а затем выполненные
+                const notDone = tasksList.filter(task => !task.isDone);
+                const done = tasksList.filter(task => task.isDone);
+                return [...notDone, ...done];
+        }
+    };
+    
+    const filteredTasks = getFilteredTasks(); // <-- ИСПОЛЬЗУЕМ отфильтрованный список
 
     const gridSize = (textLength: number) => {
         if (textLength > 450) return "span 3";
@@ -251,7 +328,7 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
             userId: user.id,
             createdAt: new Date(),
             isImportant: false,
-            isDone: false // <-- ДОБАВЛЕНО
+            isDone: false 
         })
         setIsCreating(true)
     }
@@ -320,24 +397,7 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
             }}>
                 
                 {/* ASIDE (Сайдбар) */}
-                <Box
-                    component="aside"
-                    sx={{
-                        backgroundColor: '#edd2c4', 
-                        padding: '20px',
-                        borderRadius: 3,
-                        minHeight: '100%',
-                        
-                        '@media screen and (max-width: 991px)': {
-                            order: 1,
-                        },
-                    }}
-                >
-                    <Typography variant="h6" sx={{ color: '#1e1e1e', marginBottom: '10px' }}>Filters</Typography>
-                    <Typography variant="body1" sx={{ color: '#555' }}>
-                        * Filter options will go here *
-                    </Typography>
-                </Box>
+                <Aside currentFilter={currentFilter} setCurrentFilter={setCurrentFilter} />
                 
                 {/* TASK LIST CONTAINER (Основная область) */}
                 <Box
@@ -359,7 +419,8 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
                             paddingBottom: '20px',
                         }}
                     >
-                        {tasksList.map(task => {
+                        {/* ИСПОЛЬЗУЕМ filteredTasks */}
+                        {filteredTasks.map(task => {
                             const isTaskDone = task.isDone;
                             
                             return (
@@ -373,7 +434,7 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
                                         borderRadius: 3,
                                         backgroundColor: task.isImportant ? "#2d2d48" : "#1e1e1e",
                                         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)',
-                                        opacity: isTaskDone ? 0.7 : 1, // Визуальный эффект
+                                        opacity: isTaskDone ? 0.7 : 1, 
                                     }}
                                 >
                                     <CardContent>
@@ -388,7 +449,7 @@ const Tasks: FC<{ user: User }> = ({ user }) => {
                                             sx={{ 
                                                 margin: "10px 0", 
                                                 fontWeight: 700,
-                                                textDecoration: isTaskDone ? 'line-through' : 'none', // Зачеркивание
+                                                textDecoration: isTaskDone ? 'line-through' : 'none', 
                                                 color: isTaskDone ? '#888' : 'white',
                                             }}
                                         >
