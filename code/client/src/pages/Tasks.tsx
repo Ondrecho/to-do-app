@@ -1,6 +1,7 @@
-import { Checkbox, Box, Button, Card, CardActions, CardContent, IconButton, TextField, Typography, Container, Fab } from "@mui/material"
+// src/pages/Tasks.tsx
+
+import { Checkbox, Box, Button, Card, CardActions, CardContent, IconButton, TextField, Typography } from "@mui/material"
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import AddIcon from '@mui/icons-material/Add';
 import { Fragment, useEffect, useState, FC, useContext } from "react";
 import { method } from "../api/methods";
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -9,7 +10,7 @@ import ModalComponent from "../components/utilities/Modal";
 import AlertComponent, { AlertTypes, AlertStateType } from "../components/utilities/Alert";
 import DateSelect from "../components/utilities/DateSelect";
 import { UserContext } from "../Main";
-import { User, Task, UserContextType } from '../api/types'; // Добавлен UserContextType
+import { User, Task, UserContextType } from '../api/types';
 
 const Form: FC<{
     isCreating: boolean,
@@ -17,20 +18,20 @@ const Form: FC<{
     setTasksList: React.Dispatch<React.SetStateAction<Task[]>>
     currentTask: Task,
     userId: number
-    setIsOpen: React.Dispatch<React.SetStateAction<boolean>> // Добавлен пропс для закрытия модального окна
+    setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
 }> = ({ isCreating, setError, setTasksList, currentTask, userId, setIsOpen }) => {
 
-    const userContext = useContext(UserContext) as UserContextType // Приводим тип к UserContextType
+    const userContext = useContext(UserContext) as UserContextType
 
     if (!userContext || !userContext.user) return null;
 
-    const { user } = userContext; 
+    const { user } = userContext;
 
     const [formData, setFormData] = useState<Task>({
         id: currentTask.id,
-        title: currentTask.title || "", // Инициализация пустой строкой, если нет значения
+        title: currentTask.title || "",
         description: currentTask.description || "",
-        userId: user.id, // Используем user.id
+        userId: user.id,
         createdAt: currentTask.createdAt || new Date(),
         isImportant: currentTask.isImportant || false
     })
@@ -44,11 +45,10 @@ const Form: FC<{
             const { data: newTask } = await method.task.update(formData);
 
             setTasksList(prev => [...prev.filter(item => item.id !== currentTask.id), newTask])
-            setIsOpen(false) // Закрываем модальное окно после успеха
+            setIsOpen(false)
         } 
         catch (error) {
             console.error(error)
-            // Улучшенная обработка ошибок (используя Optional Chaining)
             const errorMessage = error.response?.data?.error?.innerErrors?.[0]?.message ?? error.response?.data?.Message ?? "Unknown error during update.";
             setError({ message: errorMessage, isVisible: true })
         }
@@ -65,7 +65,7 @@ const Form: FC<{
             });
 
             setTasksList(prev => [...prev, newTask])
-            setIsOpen(false) // Закрываем модальное окно после успеха
+            setIsOpen(false)
         } 
         catch (error) {
             console.error(error)
@@ -122,6 +122,7 @@ const Form: FC<{
 
             {isCreating && <Box sx={style}>
                 <Typography sx={{ width: "100px" }}>Date: </Typography>
+
                 <DateSelect 
                     value={formData.createdAt as Date} 
                     setValue={(value) => handleFormChange("createdAt", value)} 
@@ -142,13 +143,15 @@ const Form: FC<{
                 sx={{ marginTop: "30px" }} 
                 variant="contained" 
                 onClick={isCreating ? createHandle : updateHandle}
-                disabled={!formData.title || !formData.description.length} // Проверка на title и description
+                disabled={!formData.title || !formData.description.length}
             >
                 {isCreating ? "Create" : "Update"}
             </Button>
         </Box>
     </Fragment>)
 }
+
+
 const Tasks: FC<{ logout: () => void, user: User }> = ({ logout, user }) => {
     const [tasksList, setTasksList] = useState<Task[]>([])
     const [isEditing, setIsEditing] = useState<boolean>(false)
@@ -174,7 +177,6 @@ const Tasks: FC<{ logout: () => void, user: User }> = ({ logout, user }) => {
             setTasksList(data)
         } catch (error) {
             console.error("Error fetching tasks:", error);
-            // Обработка ошибки загрузки
             const errorMessage = error.response?.data?.Message ?? "Failed to load tasks.";
             setError({ message: errorMessage, isVisible: true });
         }
@@ -184,10 +186,10 @@ const Tasks: FC<{ logout: () => void, user: User }> = ({ logout, user }) => {
         fetchData()
     }, [])
 
-    const deleteHandle = async (id: number | undefined) => { // id может быть undefined
+    const deleteHandle = async (id: number | undefined) => {
         if (!id) return;
         try {
-            await method.task.delete(String(id)); // API требует строку
+            await method.task.delete(String(id));
             setTasksList(tasksList.filter(task => task.id !== id))
         } 
         catch (error) {
@@ -197,23 +199,35 @@ const Tasks: FC<{ logout: () => void, user: User }> = ({ logout, user }) => {
         }
     }
     
-    // Использование template string, так как gridSize требует строковый вывод для gridColumn
     const gridSize = (textLength: number) => {
         if (textLength > 450) return "span 3";
         if (textLength > 50) return "span 2";
         return "span 1";
     }
 
+    // Вспомогательная функция для форматирования даты
+    const formatDate = (date: Date | string | undefined): string => {
+        if (!date) return 'N/A';
+        try {
+            // Если приходит строка (например, с сервера), преобразуем
+            const dateObj = typeof date === 'string' ? new Date(date) : date;
+            return dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString();
+        } catch (e) {
+            console.error("Error formatting date:", e);
+            return 'Invalid Date';
+        }
+    };
+
+
     return (<Fragment>
         
         <Box 
             sx={{
-                // Применение фона на главную страницу
-                backgroundImage: 'url(/background.jpg)', 
+                backgroundImage: 'url(/background.png)', 
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundAttachment: 'fixed', 
-                minHeight: 'calc(100vh - 80px)', // Высота минус хедер (примерная высота AppBar)
+                minHeight: 'calc(100vh - 80px)', 
                 padding: '20px', 
             }}
         >
@@ -235,7 +249,6 @@ const Tasks: FC<{ logout: () => void, user: User }> = ({ logout, user }) => {
                 <Button 
                     variant="contained" 
                     onClick={() => {
-                        // Сброс currentTask для создания
                         setCurrentTask({
                             id: 0,
                             title: "",
@@ -250,7 +263,7 @@ const Tasks: FC<{ logout: () => void, user: User }> = ({ logout, user }) => {
                     Create a task
                 </Button>
             </Box>
-
+            
             <Box 
             sx={{
                 display: "grid", 
@@ -274,15 +287,14 @@ const Tasks: FC<{ logout: () => void, user: User }> = ({ logout, user }) => {
                                 display: "flex", 
                                 flexDirection: "column", 
                                 justifyContent: "space-between",
-                                // Стиль карточки
-                                borderRadius: 3, // Большее закругление
-                                backgroundColor: task.isImportant ? "#848600ff" : "#1e1e1e", // Более темный фон для "важных" задач
+                                borderRadius: 3,
+                                backgroundColor: task.isImportant ? "#2d2d48" : "#1e1e1e",
                                 boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)',
                             }}
                         >
                             <CardContent>
                                 <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                    {new Date(task.createdAt || "").toLocaleString()}
+                                    {formatDate(task.createdAt)} {/* ИСПРАВЛЕНО: Используем formatDate */}
                                 </Typography>
                                 <Typography variant="h5" component="div" sx={{ margin: "10px 0", fontWeight: 700 }}>
                                     {task.title}
@@ -308,8 +320,8 @@ const Tasks: FC<{ logout: () => void, user: User }> = ({ logout, user }) => {
                     )
                 })}
             </Box>
-
         </Box> 
+
 
         <ModalComponent isOpen={isCreating || isEditing} setIsOpen={isCreating ? setIsCreating : setIsEditing}>
             <Form 
@@ -318,7 +330,7 @@ const Tasks: FC<{ logout: () => void, user: User }> = ({ logout, user }) => {
                 setTasksList={setTasksList} 
                 isCreating={isCreating} 
                 setError={setError} 
-                setIsOpen={isCreating ? setIsCreating : setIsEditing} // Передаем функцию закрытия
+                setIsOpen={isCreating ? setIsCreating : setIsEditing}
             />
         </ModalComponent>
 

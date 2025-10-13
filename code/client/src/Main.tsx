@@ -1,34 +1,24 @@
 // src/Main.tsx
 
 import React, { useMemo } from "react"
-// Исправлено: Все импорты MUI объединены
-import { ThemeProvider, Typography, Box, Container, AppBar, Toolbar } from "@mui/material"
+import { ThemeProvider, Typography, Box, Container, AppBar, Toolbar, CssBaseline } from "@mui/material"
 import AuthPage from "./pages/AuthPage"
-// Исправлено: Добавлен useLocation
-import { BrowserRouter, Route, Routes, useNavigate, useLocation } from "react-router-dom" 
+import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom"
 import AuthGuard from "./components/utilities/AuthGuard"
 import Tasks from "./pages/Tasks"
-import CssBaseline from "@mui/material/CssBaseline";
-// Исправлено: Консолидированный импорт типов
-import { User, UserContextType } from './api/types'; 
-// Исправлено: Путь к теме теперь './theme/theme', как указано в структуре файлов
-import { theme } from './theme/theme'; 
+import { User, UserContextType } from './api/types';
+import { theme } from './theme/theme';
+
 
 export const UserContext = React.createContext<UserContextType | null>(null);
 
 const Header = () => {
-    // Исправлено: useLocation теперь доступен
-    const location = useLocation();
-
-    if (location.pathname === '/login' || location.pathname === '/register') {
-        return null;
-    }
-
+    // Хедер отображается везде, логика скрытия удалена
     return (
         <AppBar 
             position="static" 
             sx={{ 
-                backgroundColor: 'transparent', 
+                backgroundColor: '#fbedde', // Установлен цвет fbedde
                 boxShadow: 'none', 
                 padding: '16px 0' 
             }}
@@ -51,7 +41,6 @@ const Header = () => {
 
 const Main: React.FC<{}> = ({}) => {
 
-    // Функция logout
     const logout = () => {
         localStorage.removeItem("token")
         setUser({
@@ -62,7 +51,6 @@ const Main: React.FC<{}> = ({}) => {
         })
     }
 
-    // Состояние пользователя
     const [user, setUser] = React.useState<User | null>(() => {
         return {
             id: 0,
