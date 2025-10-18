@@ -34,6 +34,7 @@ public class TaskService implements ITaskService {
         task.setTitle(trimmedTitle);
         task.setDescription(trimmedDescription);
         task.setImportant(dto.isImportant());
+        task.setCompleted(false);
         task.setCreatedAt(createdAt);
         task.setUserId(userId);
 
@@ -60,6 +61,7 @@ public class TaskService implements ITaskService {
         task.setTitle(dto.getTitle().trim());
         task.setDescription(dto.getDescription().trim());
         task.setImportant(dto.isImportant());
+        task.setCompleted(dto.isCompleted());
         task.setCreatedAt(dto.getCreatedAt());
 
         Task saved = taskRepository.save(task);
@@ -81,6 +83,7 @@ public class TaskService implements ITaskService {
         d.setTitle(task.getTitle());
         d.setDescription(task.getDescription());
         d.setImportant(task.isImportant());
+        d.setCompleted(task.isCompleted());
         d.setCreatedAt(task.getCreatedAt());
         d.setUserId(task.getUserId());
         return d;

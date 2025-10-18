@@ -2,7 +2,6 @@ package com.ondrecho.todo.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.time.OffsetDateTime;
@@ -15,11 +14,13 @@ public class TaskDto {
     @Size(max = 255, message = "Title must not exceed 255 characters")
     private String title;
 
-    @NotBlank(message = "Description is required") // Изменил с @NotNull на @NotBlank
+    @NotBlank(message = "Description is required")
     @Size(max = 2000, message = "Description must not exceed 2000 characters")
     private String description;
 
     private boolean isImportant;
+
+    private boolean completed;
 
     private OffsetDateTime createdAt;
 
@@ -36,6 +37,9 @@ public class TaskDto {
     public void setDescription(String description) { this.description = description; }
     @Schema(description = "Is important flag")
     public boolean isImportant() { return isImportant; }
+    @Schema(description = "Is completed flag")
+    public boolean isCompleted() { return completed; }
+    public void setCompleted(boolean completed) { this.completed = completed; }
     public void setImportant(boolean important) { isImportant = important; }
     @Schema(description = "Creation date")
     public OffsetDateTime getCreatedAt() { return createdAt; }
