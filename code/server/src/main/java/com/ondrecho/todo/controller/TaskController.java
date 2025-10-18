@@ -33,10 +33,14 @@ public class TaskController {
         return ResponseEntity.ok(taskService.createTask(dto, userId));
     }
 
-    @PutMapping
-    public ResponseEntity<TaskDto> updateTask(@Valid @RequestBody TaskDto dto) {
+    @PutMapping("/{id}")
+    public ResponseEntity<TaskDto> updateTask(
+            @PathVariable Long id,
+            @Valid @RequestBody TaskDto dto) {
         Long userId = securityUtils.getCurrentUserId();
         if (userId == null) return ResponseEntity.status(401).build();
+
+        dto.setId(id);
         return ResponseEntity.ok(taskService.updateTask(dto, userId));
     }
 
