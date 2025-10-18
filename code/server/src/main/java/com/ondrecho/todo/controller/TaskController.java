@@ -3,6 +3,7 @@ package com.ondrecho.todo.controller;
 import com.ondrecho.todo.dto.TaskDto;
 import com.ondrecho.todo.service.ITaskService;
 import com.ondrecho.todo.security.SecurityUtils;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,14 +25,16 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<TaskDto> createTask(HttpServletRequest request, @RequestBody TaskDto dto) {
+    public ResponseEntity<TaskDto> createTask(HttpServletRequest request,
+                                              @Valid @RequestBody TaskDto dto) {
         Long userId = SecurityUtils.getCurrentUserId(request);
         if (userId == null) return ResponseEntity.status(401).build();
         return ResponseEntity.ok(taskService.createTask(dto, userId));
     }
 
     @PutMapping
-    public ResponseEntity<TaskDto> updateTask(HttpServletRequest request, @RequestBody TaskDto dto) {
+    public ResponseEntity<TaskDto> updateTask(HttpServletRequest request,
+                                              @Valid @RequestBody TaskDto dto) {
         Long userId = SecurityUtils.getCurrentUserId(request);
         if (userId == null) return ResponseEntity.status(401).build();
         return ResponseEntity.ok(taskService.updateTask(dto, userId));

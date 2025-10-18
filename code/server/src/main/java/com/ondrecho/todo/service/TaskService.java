@@ -1,10 +1,12 @@
 package com.ondrecho.todo.service;
 
 import com.ondrecho.todo.dto.TaskDto;
+import com.ondrecho.todo.exception.BadRequestException;
+import com.ondrecho.todo.exception.ForbiddenException;
+import com.ondrecho.todo.exception.NotFoundException;
 import com.ondrecho.todo.model.Task;
 import com.ondrecho.todo.repository.TaskRepository;
 import org.springframework.stereotype.Service;
-
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,34 +26,59 @@ public class TaskService implements ITaskService {
 
     @Override
     public TaskDto createTask(TaskDto dto, Long userId) {
+        String trimmedTitle = dto.getTitle().trim();
+        String trimmedDescription = dto.getDescription().trim();
+        OffsetDateTime createdAt = dto.getCreatedAt() != null ? dto.getCreatedAt() : OffsetDateTime.now();
+
+        validateTaskBusinessRules(dto);
+
         Task task = new Task();
-        task.setTitle(dto.getTitle());
-        task.setDescription(dto.getDescription());
+        task.setTitle(trimmedTitle);
+        task.setDescription(trimmedDescription);
         task.setImportant(dto.isImportant());
-        task.setCreatedAt(dto.getCreatedAt() == null ? OffsetDateTime.now() : dto.getCreatedAt());
+        task.setCreatedAt(createdAt);
         task.setUserId(userId);
 
-        Task saved = taskRepository.save(task);
-        return toDto(saved);
+        return toDto(taskRepository.save(task));
     }
 
     @Override
     public TaskDto updateTask(TaskDto dto, Long userId) {
-        Task task = taskRepository.findById(dto.getId()).orElseThrow(() -> new com.ondrecho.todo.exception.NotFoundException("Task not found"));
-        if (!task.getUserId().equals(userId)) {
-            throw new com.ondrecho.todo.exception.ForbiddenException("Forbidden");
+        if (dto.getId() == null) {
+            throw new BadRequestException("Task id is required for update");
         }
-        task.setTitle(dto.getTitle());
-        task.setDescription(dto.getDescription());
+
+        Task task = taskRepository.findById(dto.getId())
+                .orElseThrow(() -> new NotFoundException("Task not found with id: " + dto.getId()));
+
+        if (!task.getUserId().equals(userId)) {
+            throw new ForbiddenException("You don't have permission to update this task");
+        }
+
+        validateTaskBusinessRules(dto);
+
+        task.setTitle(dto.getTitle().trim());
+        task.setDescription(dto.getDescription().trim());
         task.setImportant(dto.isImportant());
         task.setCreatedAt(dto.getCreatedAt());
+
         Task saved = taskRepository.save(task);
         return toDto(saved);
     }
 
+    private void validateTaskBusinessRules(TaskDto dto) {
+        if (dto.getCreatedAt().isAfter(OffsetDateTime.now())) {
+            throw new BadRequestException("Creation date cannot be in the future");
+        }
+
+        if (dto.getDescription().trim().length() > 2000) {
+            throw new BadRequestException("Description must not exceed 2000 characters");
+        }
+    }
+
     @Override
     public void deleteTask(Long id, Long userId) {
-        Task task = taskRepository.findById(id).orElseThrow(() -> new com.ondrecho.todo.exception.NotFoundException("Task not found"));
+        Task task = taskRepository.findById(id).orElseThrow(() -> new NotFoundException("Task not found"));
         if (!task.getUserId().equals(userId)) {
             throw new com.ondrecho.todo.exception.ForbiddenException("Forbidden");
         }

@@ -1,15 +1,29 @@
 package com.ondrecho.todo.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 import java.time.OffsetDateTime;
 
 @Schema(description = "Task DTO")
 public class TaskDto {
     private Long id;
+
+    @NotBlank(message = "Title is required")
+    @Size(max = 255, message = "Title must not exceed 255 characters")
     private String title;
+
+    @NotBlank(message = "Description is required") // Изменил с @NotNull на @NotBlank
+    @Size(max = 2000, message = "Description must not exceed 2000 characters")
     private String description;
+
     private boolean isImportant;
+
+    @NotNull(message = "Created date is required")
     private OffsetDateTime createdAt;
+
     private Long userId;
 
     @Schema(description = "Task id")
