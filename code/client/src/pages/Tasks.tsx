@@ -35,7 +35,7 @@ const Form: FC<{
         userId: user.id,
         createdAt: currentTask.createdAt || new Date(),
         isImportant: currentTask.isImportant || false,
-        isDone: currentTask.isDone || false 
+        completed: currentTask.completed || false 
     })
 
     const handleFormChange = (field: keyof Task, value: any) => {
@@ -65,7 +65,7 @@ const Form: FC<{
                 description: formData.description,
                 createdAt: formData.createdAt,
                 isImportant: formData.isImportant,
-                isDone: false 
+                completed: false 
             });
 
             setTasksList(prev => [...prev, newTask])
@@ -246,7 +246,7 @@ const Tasks: FC<{ user: User, themeMode: 'light' | 'dark' }> = ({ user, themeMod
         userId: user.id,
         createdAt: new Date(),
         isImportant: false,
-        isDone: false 
+        completed: false 
     })
 
     const [error, setError] = useState<AlertStateType>({
@@ -285,7 +285,7 @@ const Tasks: FC<{ user: User, themeMode: 'light' | 'dark' }> = ({ user, themeMod
     const handleDone = async (taskToToggle: Task) => {
         const updatedTask: Task = {
             ...taskToToggle,
-            isDone: !taskToToggle.isDone
+            completed: !taskToToggle.completed
         };
         
         try {
@@ -304,13 +304,13 @@ const Tasks: FC<{ user: User, themeMode: 'light' | 'dark' }> = ({ user, themeMod
     const getFilteredTasks = (): Task[] => {
         switch (currentFilter) {
             case 'important':
-                return tasksList.filter(task => task.isImportant && !task.isDone);
+                return tasksList.filter(task => task.isImportant && !task.completed);
             case 'completed':
-                return tasksList.filter(task => task.isDone);
+                return tasksList.filter(task => task.completed);
             case 'all':
             default:
-                const notDone = tasksList.filter(task => !task.isDone);
-                const done = tasksList.filter(task => task.isDone);
+                const notDone = tasksList.filter(task => !task.completed);
+                const done = tasksList.filter(task => task.completed);
                 return [...notDone, ...done];
         }
     };
@@ -343,13 +343,13 @@ const Tasks: FC<{ user: User, themeMode: 'light' | 'dark' }> = ({ user, themeMod
             userId: user.id,
             createdAt: new Date(),
             isImportant: false,
-            isDone: false 
+            completed: false 
         })
         setIsCreating(true)
     }
 
-    const getTaskTextColor = (isDone: boolean) => {
-        if (isDone) {
+    const getTaskTextColor = (completed: boolean) => {
+        if (completed) {
             return '#888'; 
         }
         return themeMode === 'light' ? '#121212' : '#ffffff'; 
@@ -438,7 +438,7 @@ const Tasks: FC<{ user: User, themeMode: 'light' | 'dark' }> = ({ user, themeMod
                         }}
                     >
                         {filteredTasks.map(task => {
-                            const isTaskDone = task.isDone;
+                            const isTaskDone = task.completed;
                             const textColor = getTaskTextColor(isTaskDone); 
                             
                             const cardBg = task.isImportant 

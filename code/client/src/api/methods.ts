@@ -5,37 +5,12 @@ export const api = axios.create({
     baseURL: "/api",
 });
 
-api.interceptors.request.use(
-    config => {
-        config.headers["Authorization"] = `Bearer ${localStorage.getItem("token")}`
-        
-        return config;
+api.interceptors.request.use(config => {
+    const token = localStorage.getItem("token");
+    if (token) {
+        config.headers["Authorization"] = `Bearer ${token}`;
     }
-)
-
-const MOCK_USER: User = { 
-    id: 1,
-    username: "Admin",
-    password: "",
-    isAuthenticated: true,
-}
-
-const NOW_ISO = new Date().toISOString();
-const YESTERDAY_ISO = new Date(Date.now() - 86400000).toISOString();
-const HOUR_AGO_ISO = new Date(Date.now() - 3600000).toISOString();
-
-const MOCK_TASKS: Task[] = [
-    {id: 101, userId: 1, title: "Настроить авторизацию", description: "Настроить обращения к API.", isImportant: true, isDone: false, createdAt: NOW_ISO},
-    {id: 102, userId: 1, title: "Протестировать роутинг", description: "Проверить, что фронтенд корректно переходит между страницами /login, /register и /.", isImportant: false, isDone: true, createdAt: YESTERDAY_ISO}, 
-    {id: 103, userId: 1, title: "Настроить Nginx", description: "Вернуться к настройке Nginx Reverse Proxy после завершения работы над фронтом.", isImportant: false, isDone: false, createdAt: HOUR_AGO_ISO}
-]
-
-const createMockResponse = <T>(data: T): AxiosResponse<T> => ({
-    data,
-    status: 200, 
-    statusText: 'OK', 
-    headers: {}, 
-    config: {} as any
+    return config;
 });
 
 export const method = {
@@ -48,40 +23,25 @@ export const method = {
             return api.post<LoginAnswer>("/auth/register", data);
         },
     },
-    
+
     task: {
         get(): Promise<AxiosResponse<Task[]>> {
-            console.log("MOCK: Getting tasks.")
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    resolve(createMockResponse(MOCK_TASKS))
-                }, 300)
-            })
+            return api.get<Task[]>("/task");
         },
-        delete(id: string): Promise<AxiosResponse<{answer: string}>> {
-            console.log(`MOCK: Deleting task ${id}.`)
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    resolve(createMockResponse({answer: `Task ${id} deleted.`}))
-                }, 300)
-            })
+
+        delete(id: string): Promise<AxiosResponse<{ answer: string }>> {
+            return api.delete<{ answer: string }>(`/task/${id}`);
         },
+
         create(data: Task): Promise<AxiosResponse<Task>> {
-            console.log(`MOCK: Creating task: ${data.title}`)
-            const newTask: Task = {...data, id: Date.now(), userId: MOCK_USER.id, createdAt: new Date().toISOString(), isDone: false} 
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    resolve(createMockResponse(newTask))
-                }, 300)
-            })
+            return api.post<Task>("/task", {
+                ...data,
+                completed: false, 
+            });
         },
+
         update(data: Task): Promise<AxiosResponse<Task>> {
-            console.log(`MOCK: Updating task: ${data.id}`)
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    resolve(createMockResponse(data))
-                }, 300)
-            })
+            return api.put<Task>(`/task/${data.id}`, data);
         },
-    }
-}
+    },
+};
