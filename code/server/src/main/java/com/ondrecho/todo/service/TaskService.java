@@ -30,8 +30,6 @@ public class TaskService implements ITaskService {
         String trimmedDescription = dto.getDescription().trim();
         OffsetDateTime createdAt = dto.getCreatedAt() != null ? dto.getCreatedAt() : OffsetDateTime.now();
 
-        validateTaskBusinessRules(dto);
-
         Task task = new Task();
         task.setTitle(trimmedTitle);
         task.setDescription(trimmedDescription);
@@ -48,14 +46,16 @@ public class TaskService implements ITaskService {
             throw new BadRequestException("Task id is required for update");
         }
 
+        if (dto.getCreatedAt() == null) {
+            throw new BadRequestException("Created date is required for update");
+        }
+
         Task task = taskRepository.findById(dto.getId())
                 .orElseThrow(() -> new NotFoundException("Task not found with id: " + dto.getId()));
 
         if (!task.getUserId().equals(userId)) {
             throw new ForbiddenException("You don't have permission to update this task");
         }
-
-        validateTaskBusinessRules(dto);
 
         task.setTitle(dto.getTitle().trim());
         task.setDescription(dto.getDescription().trim());
@@ -64,16 +64,6 @@ public class TaskService implements ITaskService {
 
         Task saved = taskRepository.save(task);
         return toDto(saved);
-    }
-
-    private void validateTaskBusinessRules(TaskDto dto) {
-        if (dto.getCreatedAt().isAfter(OffsetDateTime.now())) {
-            throw new BadRequestException("Creation date cannot be in the future");
-        }
-
-        if (dto.getDescription().trim().length() > 2000) {
-            throw new BadRequestException("Description must not exceed 2000 characters");
-        }
     }
 
     @Override

@@ -21,7 +21,6 @@ public class TaskDto {
 
     private boolean isImportant;
 
-    @NotNull(message = "Created date is required")
     private OffsetDateTime createdAt;
 
     private Long userId;
