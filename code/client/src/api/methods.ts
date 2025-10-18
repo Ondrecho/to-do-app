@@ -13,8 +13,6 @@ api.interceptors.request.use(
     }
 )
 
-const MOCK_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBZG1pbiIsImlkIjoxLCJpYXQiOjE3NjAzNTE0MjYsImV4cCI6MTc2Mzk1MTQyNn0.ONF59JnZrguNCDwrITZU2KYhkQWQT4gMsnvCHFPmD8o"
-
 const MOCK_USER: User = { 
     id: 1,
     username: "Admin",
@@ -42,34 +40,12 @@ const createMockResponse = <T>(data: T): AxiosResponse<T> => ({
 
 export const method = {
     user: {
-        login(data: AuthParams): Promise<AxiosResponse<LoginAnswer>> { 
-            console.log(`MOCK: Attempting login for user: ${data.username}`)
-            
-            const mockResponse: LoginAnswer = {
-                token: MOCK_TOKEN,
-                user: MOCK_USER,
-            }
-
-            return new Promise((resolve) => {
-                setTimeout(() => { 
-                    resolve(createMockResponse(mockResponse))
-                }, 500)
-            })
+        login(data: AuthParams): Promise<AxiosResponse<LoginAnswer>> {
+            return api.post<LoginAnswer>("/auth/login", data);
         },
 
         register(data: AuthParams): Promise<AxiosResponse<LoginAnswer>> {
-            console.log(`MOCK: Registering user: ${data.username}`)
-            
-            const mockResponse: LoginAnswer = {
-                token: MOCK_TOKEN,
-                user: MOCK_USER,
-            }
-            
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    resolve(createMockResponse(mockResponse))
-                }, 500)
-            })
+            return api.post<LoginAnswer>("/auth/register", data);
         },
     },
     

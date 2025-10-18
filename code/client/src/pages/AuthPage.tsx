@@ -61,13 +61,13 @@ const Page: React.FC<{isRegistration: boolean}> = ({isRegistration}) => {
                 setTimeout(() => {
                 navigate("/");
                 }, 200);
-            } catch (err: any) {
-                console.error(err);
+                } catch (err: any) {
+                                console.error(err);
                 helpers.setStatus({ success: false });
-                formik.setErrors({
-                submit: err.response?.data?.error,
-                });
-            }
+                                formik.setErrors({
+                                submit: err.response?.data?.Message || "Произошла неизвестная ошибка",
+                                });
+                }
         },
 
     });
