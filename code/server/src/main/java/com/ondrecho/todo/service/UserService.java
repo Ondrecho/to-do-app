@@ -13,12 +13,13 @@ import java.util.Optional;
 @Service
 public class UserService implements IUserService {
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final BCryptPasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
-    public UserService(UserRepository userRepository, JwtProvider jwtProvider) {
+    public UserService(UserRepository userRepository, JwtProvider jwtProvider, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.jwtProvider = jwtProvider;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -39,12 +40,12 @@ public class UserService implements IUserService {
 
     @Override
     public AuthResponse login(AuthRequest request) {
-    User user = userRepository.findByUsername(request.getUsername())
-        .orElseThrow(() -> new ApiException("Invalid credentials"));
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new ApiException("Invalid credentials"));
 
-    if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-        throw new ApiException("Invalid credentials");
-    }
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new ApiException("Invalid credentials");
+        }
 
         String token = jwtProvider.generateToken(user.getId(), user.getUsername());
         return new AuthResponse(token, user.getId(), user.getUsername());
