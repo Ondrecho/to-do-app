@@ -15,7 +15,7 @@ public class Task {
     @Column(length = 2000)
     private String description;
 
-    private boolean isImportant;
+    private boolean important;
 
     private boolean completed;
 
@@ -29,8 +29,8 @@ public class Task {
     public void setTitle(String title) { this.title = title; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
-    public boolean isImportant() { return isImportant; }
-    public void setImportant(boolean important) { isImportant = important; }
+    public boolean isImportant() { return important; }
+    public void setImportant(boolean important) { this.important = important; }
     public boolean isCompleted() { return completed; }
     public void setCompleted(boolean completed) { this.completed = completed; }
     public OffsetDateTime getCreatedAt() { return createdAt; }

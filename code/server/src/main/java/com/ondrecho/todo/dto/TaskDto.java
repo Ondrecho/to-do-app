@@ -18,7 +18,7 @@ public class TaskDto {
     @Size(max = 2000, message = "Description must not exceed 2000 characters")
     private String description;
 
-    private boolean isImportant;
+    private boolean important;
 
     private boolean completed;
 
@@ -36,11 +36,11 @@ public class TaskDto {
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
     @Schema(description = "Is important flag")
-    public boolean isImportant() { return isImportant; }
+    public boolean isImportant() { return important; }
+    public void setImportant(boolean important) { this.important = important; }
     @Schema(description = "Is completed flag")
     public boolean isCompleted() { return completed; }
     public void setCompleted(boolean completed) { this.completed = completed; }
-    public void setImportant(boolean important) { isImportant = important; }
     @Schema(description = "Creation date")
     public OffsetDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(OffsetDateTime createdAt) { this.createdAt = createdAt; }
