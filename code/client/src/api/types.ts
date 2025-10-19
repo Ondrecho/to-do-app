@@ -25,8 +25,8 @@ export type Task = {
     description: string,
     important: boolean,
     completed: boolean, 
-    createdAt: Date |
-string
+    dueDate: Date | string, 
+    createdAt: Date | string 
 }
 
 export type UserContextType = {

@@ -3,14 +3,14 @@ import { Fragment, useEffect, useState, FC, useContext } from "react";
 import { method } from "../api/methods";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import DoneIcon from '@mui/icons-material/Done'; 
+import DoneIcon from '@mui/icons-material/Done';
 import PushPinIcon from '@mui/icons-material/PushPin'; 
 import StarIcon from '@mui/icons-material/Star'; 
 import ModalComponent from "../components/utilities/Modal";
 import AlertComponent, { AlertTypes, AlertStateType } from "../components/utilities/Alert";
 import DateSelect from "../components/utilities/DateSelect";
 import { UserContext } from "../Main";
-import { User, Task, UserContextType, TaskFilter } from '../api/types'; 
+import { User, Task, UserContextType, TaskFilter } from '../api/types';
 import AddIcon from '@mui/icons-material/Add'; 
 
 const Form: FC<{
@@ -31,19 +31,23 @@ const Form: FC<{
         title: currentTask.title || "",
         description: currentTask.description || "",
         userId: user.id,
-        createdAt: currentTask.createdAt || new Date(),
+        dueDate: currentTask.dueDate || new Date(), 
+        createdAt: currentTask.createdAt || new Date(), 
         important: currentTask.important || false,
         completed: currentTask.completed || false 
     })
 
     useEffect(() => {
-            setFormData({
+     
+           setFormData({
                 id: currentTask.id,
                 title: currentTask.title || "",
                 description: currentTask.description || "",
                 userId: user.id,
-                createdAt: currentTask.createdAt || new Date(),
-                important: currentTask.important || false,
+                dueDate: currentTask.dueDate || new Date(), 
+                createdAt: currentTask.createdAt || new Date(), 
+ 
+               important: currentTask.important || false,
                 completed: currentTask.completed || false 
             })
         }, [currentTask, user.id]) 
@@ -52,16 +56,17 @@ const Form: FC<{
         setFormData({ ...formData, [field]: value })
     }
 
-    const updateHandle = async () => {
+    const updateHandle = async () => 
+    {
         try {
             const { data: newTask } = await method.task.update(formData);
-
             setTasksList(prev => [...prev.filter(item => item.id !== currentTask.id), newTask])
             setIsOpen(false)
         } 
         catch (error) {
             console.error(error)
-            const errorMessage = error.response?.data?.error?.innerErrors?.[0]?.message ?? error.response?.data?.Message ?? "Unknown error during update.";
+            const errorMessage = error.response?.data?.error?.innerErrors?.[0]?.message ??
+            error.response?.data?.Message ?? "Unknown error during update.";
             setError({ message: errorMessage, isVisible: true })
         }
     }
@@ -71,19 +76,21 @@ const Form: FC<{
             const { data: newTask } = await method.task.create({
                 id: 0,
                 userId,
-                title: formData.title,
+      
+                 title: formData.title,
                 description: formData.description,
-                createdAt: formData.createdAt,
+                dueDate: formData.dueDate, 
+                createdAt: formData.createdAt, 
                 important: formData.important,
                 completed: false 
             });
-
             setTasksList(prev => [...prev, newTask])
             setIsOpen(false)
         } 
         catch (error) {
             console.error(error)
-            const errorMessage = error.response?.data?.error?.innerErrors?.[0]?.message ?? error.response?.data?.Message ?? "Unknown error during creation.";
+            const errorMessage = error.response?.data?.error?.innerErrors?.[0]?.message ??
+            error.response?.data?.Message ?? "Unknown error during creation.";
             setError({ message: errorMessage, isVisible: true })
         }
     }
@@ -96,7 +103,8 @@ const Form: FC<{
 
         "@media screen and (max-width: 576px)": {
             flexDirection: "column",
-            alignItems: "flex-start",
+     
+               alignItems: "flex-start",
         }
     }
 
@@ -107,59 +115,70 @@ const Form: FC<{
 
         <Box sx={{ display: "flex", flexDirection: "column", gap: "15px" }}>
             <Box sx={style}>
-                <Typography sx={{ width: "100px" }}>Title: </Typography>
+    
+                     <Typography sx={{ width: "100px" }}>Title: </Typography>
 
                 <TextField
                     sx={{ width: "100%" }}
                     id="name"
                     label="Title"
-                    multiline
+    
+                     multiline
                     value={formData.title}
                     onChange={(e) => handleFormChange("title", e.target.value)}
                 />
             </Box>
 
-            <Box sx={style}>
+            <Box 
+            sx={style}>
                 <Typography sx={{ width: "100px" }}>Description: </Typography>
 
                 <TextField
                     sx={{ width: "100%" }}
                     id="description"
-                    label="Description"
+                    
+                 label="Description"
                     multiline
                     minRows={3}
                     maxRows={30}
                     value={formData.description}
-                    onChange={(e) => handleFormChange("description", e.target.value)}
+                    
+                 onChange={(e) => handleFormChange("description", e.target.value)}
                 />
             </Box>
 
-            {isCreating && <Box sx={style}>
-                <Typography sx={{ width: "100px" }}>Date: </Typography>
+            <Box sx={style}> 
+                <Typography sx={{ width: "100px" }}>Due Date: </Typography> 
 
                 <DateSelect 
-                    value={formData.createdAt as Date} 
-                    setValue={(value) => handleFormChange("createdAt", value)} 
-                    label="Date" 
+                
+                     value={formData.dueDate as Date}  
+                    setValue={(value) => handleFormChange("dueDate", value)}  
+                    label="Due Date"  
                 />
-            </Box>}
+            </Box>
 
             <Box sx={style}>
-                <Typography sx={{ width: "100px" }}>Important: </Typography>
+       
+                 <Typography sx={{ width: "100px" }}>Important: </Typography>
                 
                 <Checkbox 
                     checked={Boolean(formData.important)} 
                     onChange={(e) => handleFormChange("important", e.target.checked)} 
-                />
+        
+                 />
             </Box>
 
             <Button 
                 sx={{ marginTop: "30px" }} 
                 variant="contained" 
-                onClick={isCreating ? createHandle : updateHandle}
-                disabled={!formData.title || !formData.description.length}
+                onClick={isCreating ?
+                createHandle : updateHandle}
+                disabled={!formData.title ||
+                !formData.description.length}
             >
-                {isCreating ? "Create" : "Update"}
+                {isCreating ?
+                "Create" : "Update"}
             </Button>
         </Box>
     </Fragment>)
@@ -171,13 +190,11 @@ const Aside: FC<{
 }> = ({ currentFilter, setCurrentFilter }) => {
     
     const theme = useTheme();
-
     const filters: { label: string, filter: TaskFilter, icon: JSX.Element }[] = [
         { label: "Tasks", filter: "all", icon: <PushPinIcon /> },
         { label: "Important", filter: "important", icon: <StarIcon /> },
         { label: "Completed", filter: "completed", icon: <DoneIcon /> },
     ];
-
     return (
         <Box
             component="aside"
@@ -185,54 +202,69 @@ const Aside: FC<{
                 backgroundColor: theme.palette.mode === 'light' ? '#edd2c4' : '#272727', 
                 padding: '20px',
                 borderRadius: 3,
-                minHeight: '100%', 
+         
+               minHeight: '100%', 
                 
                 '@media screen and (max-width: 991px)': {
                     order: 1,
                 },
             }}
-        >
+     
+           >
             <Typography 
                 variant="h6" 
                 align="center"
                 sx={{ 
                     color: theme.palette.mode === 'light' ? '#1e1e1e' : theme.palette.text.primary, 
-                    marginBottom: '10px' 
+      
+                     marginBottom: '10px' 
                 }}
             >
                 Filters
             </Typography>
             <List>
-                {filters.map(({ label, filter, icon }) => (
+                
+                 {filters.map(({ label, filter, icon }) => (
                     <ListItem key={filter} disablePadding>
                         <ListItemButton
                             onClick={() => setCurrentFilter(filter)}
-                            selected={currentFilter === filter}
+                  
+                     selected={currentFilter === filter}
                             sx={{
                                 borderRadius: 2,
-                                '&.Mui-selected': {
-                                    backgroundColor: theme.palette.mode === 'light' ? '#e6c3af' : '#444444', 
+                           
+                     '&.Mui-selected': {
+                                    backgroundColor: theme.palette.mode === 'light' ?
+                                    '#e6c3af' : '#444444', 
                                     '&:hover': {
-                                        backgroundColor: theme.palette.mode === 'light' ? '#e6c3af' : '#444444',
+                                        backgroundColor: theme.palette.mode === 'light' ?
+                                        '#e6c3af' : '#444444',
                                     }
                                 }
                             }}
-                        >
+  
+                           >
                             <ListItemIcon 
                                 sx={{ 
-                                    minWidth: 35, 
+                
+                                     minWidth: 35, 
                                     color: '#0087d7' 
                                 }}
-                            >
+        
+                             >
                                 {icon}
                             </ListItemIcon>
-                            <ListItemText 
+                    
+                     <ListItemText 
                                 primary={label} 
                                 primaryTypographyProps={{ 
-                                    fontWeight: currentFilter === filter ? 'bold' : 'normal',
+                         
+                           fontWeight: currentFilter === filter ?
+                           'bold' : 'normal',
                                     color: '#0087d7' 
                                 }} 
-                            />
+                           
+                     />
                         </ListItemButton>
                     </ListItem>
                 ))}
@@ -248,14 +280,14 @@ const Tasks: FC<{ user: User, themeMode: 'light' | 'dark' }> = ({ user, themeMod
     const [isCreating, setIsCreating] = useState<boolean>(false)
     const [currentFilter, setCurrentFilter] = useState<TaskFilter>('all') 
 
-    const theme = useTheme(); 
-
+    const theme = useTheme();
     const [currentTask, setCurrentTask] = useState<Task>({
         id: 0,
         title: "",
         description: "",
         userId: user.id,
-        createdAt: new Date(),
+        dueDate: new Date(), 
+        createdAt: new Date(), 
         important: false,
         completed: false 
     })
@@ -263,7 +295,8 @@ const Tasks: FC<{ user: User, themeMode: 'light' | 'dark' }> = ({ user, themeMod
     const [error, setError] = useState<AlertStateType>({
         isVisible: false,
         message: ""
-    })
+ 
+       })
 
     const fetchData = async () => {
         try {
@@ -288,7 +321,8 @@ const Tasks: FC<{ user: User, themeMode: 'light' | 'dark' }> = ({ user, themeMod
         } 
         catch (error) {
             console.log(error)
-            const errorMessage = error.response?.data?.Message ?? "Failed to delete task.";
+            const errorMessage = error.response?.data?.Message ??
+            "Failed to delete task.";
             setError({ message: errorMessage, isVisible: true });
         }
     }
@@ -298,10 +332,8 @@ const Tasks: FC<{ user: User, themeMode: 'light' | 'dark' }> = ({ user, themeMod
             ...taskToToggle,
             completed: !taskToToggle.completed
         };
-        
         try {
             const { data } = await method.task.update(updatedTask);
-            
             setTasksList(prev => prev.map(task => 
                 task.id === updatedTask.id ? data : task
             ));
@@ -326,8 +358,7 @@ const Tasks: FC<{ user: User, themeMode: 'light' | 'dark' }> = ({ user, themeMod
         }
     };
     
-    const filteredTasks = getFilteredTasks(); 
-
+    const filteredTasks = getFilteredTasks();
     const gridSize = (textLength: number) => {
         if (textLength > 450) return "span 3";
         if (textLength > 50) return "span 2";
@@ -337,9 +368,10 @@ const Tasks: FC<{ user: User, themeMode: 'light' | 'dark' }> = ({ user, themeMod
     const formatDate = (date: Date | string | undefined): string => {
         if (!date) return 'N/A';
         try {
-            const dateObj = typeof date === 'string' ? new Date(date) : date;
+            const dateObj = typeof date === 'string' ?
+            new Date(date) : date;
             if (isNaN(dateObj.getTime())) return 'Invalid Date';
-            return dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString();
+            return dateObj.toLocaleDateString(); 
         } catch (e) {
             return 'Invalid Date';
         }
@@ -352,23 +384,22 @@ const Tasks: FC<{ user: User, themeMode: 'light' | 'dark' }> = ({ user, themeMod
             title: "",
             description: "",
             userId: user.id,
-            createdAt: new Date(),
+            dueDate: new Date(), 
+            createdAt: new Date(), 
             important: false,
-            completed: false 
+   
+             completed: false 
         })
         setIsCreating(true)
     }
 
     const getTaskTextColor = (completed: boolean) => {
         if (completed) {
-            return '#888'; 
+            return '#888';
         }
         return themeMode === 'light' ? '#121212' : '#ffffff'; 
     };
-
     const bgImage = themeMode === 'light' ? 'bg-light.jpg' : 'bg-dark.jpg';
-
-
     return (<Fragment>
         
         <Box 
@@ -377,12 +408,14 @@ const Tasks: FC<{ user: User, themeMode: 'light' | 'dark' }> = ({ user, themeMod
                 top: 0,
                 left: 0,
                 width: '100%',
-                height: '100%',
+  
+                 height: '100%',
                 zIndex: -1, 
                 
                 backgroundImage: `url(/${bgImage})`, 
                 
-                backgroundSize: 'cover', 
+                backgroundSize: 
+                'cover', 
                 backgroundPosition: 'center',
                 backgroundAttachment: 'fixed',
             }}
@@ -391,25 +424,29 @@ const Tasks: FC<{ user: User, themeMode: 'light' | 'dark' }> = ({ user, themeMod
 
         <Box
             sx={{
-                position: 'fixed', 
+                position: 
+                'fixed', 
                 bottom: '30px',
                 right: '30px',
                 zIndex: 100, 
             }}
         >
             <Button 
-                variant="contained" 
+              
+                 variant="contained" 
                 color="primary"
                 onClick={handleCreateTaskClick} 
                 sx={{
                     width: '56px',
                     height: '56px',
-                    borderRadius: '50%',
+      
+                     borderRadius: '50%',
                     minWidth: 0,
                     boxShadow: '0 4px 10px rgba(0, 0, 0, 0.5)',
                 }}
             >
-                <AddIcon />
+         
+               <AddIcon />
             </Button>
         </Box>
         
@@ -417,12 +454,14 @@ const Tasks: FC<{ user: User, themeMode: 'light' | 'dark' }> = ({ user, themeMod
             
             <Box 
             sx={{
-                display: "grid", 
+               
+                 display: "grid", 
                 minHeight: 'calc(100vh - 100px)', 
                 gridTemplateColumns: "250px 1fr", 
                 gap: "20px",
 
                 "@media screen and (max-width: 991px)": {
+                    
                     gridTemplateColumns: "1fr",
                 }
             }}>
@@ -430,111 +469,150 @@ const Tasks: FC<{ user: User, themeMode: 'light' | 'dark' }> = ({ user, themeMod
                 <Aside currentFilter={currentFilter} setCurrentFilter={setCurrentFilter} />
                 
                 <Box
-                    sx={{
+    
+                     sx={{
                         display: 'flex',
                         flexDirection: 'column',
                         minHeight: '100%', 
-                        '@media screen and (max-width: 991px)': {
+        
+                         '@media screen and (max-width: 991px)': {
                             order: 2,
                         },
                     }}
-                >
+      
+                 >
                     
                     <Box 
                         sx={{
-                            display: "grid", 
+                         
+                           display: "grid", 
                             gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", 
                             gap: "20px",
                             paddingBottom: '20px',
-                        }}
+     
+                           }}
                     >
                         {filteredTasks.map(task => {
                             const isTaskDone = task.completed;
                             const textColor = getTaskTextColor(isTaskDone); 
                             
                             const cardBg = task.important 
-                                ? themeMode === 'light' ? '#fffdbc' : '#2d2d48'
-                                : themeMode === 'light' ? '#ffffff' : '#1e1e1e';
+                                ?
+                                themeMode === 'light' ? '#fffdbc' : '#2d2d48'
+                                : themeMode === 'light' ?
+                                '#ffffff' : '#1e1e1e';
                             
                             return (
                                 <Card 
                                     key={task.id}
-                                    sx={{
+                           
+                         sx={{
                                         gridColumn: gridSize(task.description.length), 
                                         display: "flex", 
-                                        flexDirection: "column", 
+       
+                                         flexDirection: "column", 
                                         justifyContent: "space-between",
-                                        borderRadius: 3,
+                        
+                                 borderRadius: 3,
                                         backgroundColor: cardBg, 
-                                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)',
+                                        boxShadow: 
+                                        '0 4px 6px rgba(0, 0, 0, 0.5)',
                                         opacity: isTaskDone ? 0.7 : 1, 
                                     }}
-                                >
+            
+                                 >
                                     <CardContent>
-                                        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                            {formatDate(task.createdAt)}
+                                        <Typography sx={{ fontSize: 14 
+                                        }} color="text.secondary" gutterBottom>
+                                            {formatDate(task.dueDate)} 
                                         </Typography>
-                                        
+              
+                                         
                                         <Typography 
-                                            variant="h5" 
+                                 
+                         variant="h5" 
                                             component="div" 
-                                            sx={{ 
+                                           
+                         sx={{ 
                                                 margin: "10px 0", 
-                                                fontWeight: 700,
-                                                textDecoration: isTaskDone ? 'line-through' : 'none', 
+                                               
+                                                 fontWeight: 700,
+                                                textDecoration: isTaskDone ?
+                                                'line-through' : 'none', 
                                                 color: textColor, 
                                             }}
-                                        >
+   
+                                             >
                                             {task.title}
-                                        </Typography>
+                   
+                                     </Typography>
                                         
-                                        <Typography 
+                                       
+                                         <Typography 
                                             variant="body2"
                                             sx={{
-                                                textDecoration: isTaskDone ? 'line-through' : 'none', 
+          
+                                                     textDecoration: isTaskDone ?
+                                                     'line-through' : 'none', 
                                                 color: textColor, 
                                             }}
-                                        >
+   
+                                             >
                                             {task.description}
-                                        </Typography>
+                   
+                                     </Typography>
                                     </CardContent>
-                                    <CardActions sx={{ backgroundColor: themeMode === 'light' ? '#f0f0f0' : '#121212' }}>
+                                    <CardActions sx={{ backgroundColor: themeMode === 'light' ?
+                                    '#f0f0f0' : '#121212' }}>
                                         
                                         <IconButton 
-                                            onClick={() => handleDone(task)}
+                
+                                             onClick={() => handleDone(task)}
                                         >
-                                            <DoneIcon color={isTaskDone ? 'success' : 'action'} />
+                              
+                                           <DoneIcon color={isTaskDone ?
+                                           'success' : 'action'} />
                                         </IconButton>
 
                                         <IconButton 
-                                            onClick={() => {
+                
+                                             onClick={() => {
                                                 setCurrentTask(task)
-                                                setIsEditing(true)
+                      
+                                                 setIsEditing(true)
                                             }}
-                                        >
+                              
+                         >
                                             <EditIcon color="primary" />
                                         </IconButton>
-                                        <IconButton onClick={() => deleteHandle(task.id)}>
+    
+                                             <IconButton onClick={() => deleteHandle(task.id)}>
                                             <DeleteIcon color="secondary"/>
-                                        </IconButton>
+                
+                                         </IconButton>
                                     </CardActions>
                                 </Card>
-                            )
+        
+                                     )
                         })}
                     </Box>
                 </Box>
             </Box>
-        </Box>
+        
+         </Box>
 
 
-        <ModalComponent isOpen={isCreating || isEditing} setIsOpen={isCreating ? setIsCreating : setIsEditing}>
+        <ModalComponent isOpen={isCreating || isEditing} setIsOpen={isCreating ?
+        setIsCreating : setIsEditing}>
             <Form 
                 userId={user.id} 
                 currentTask={currentTask} 
                 setTasksList={setTasksList} 
                 isCreating={isCreating} 
                 setError={setError} 
-                setIsOpen={isCreating ? setIsCreating : setIsEditing}
+
+                setIsOpen={isCreating ?
+                setIsCreating : setIsEditing}
             />
         </ModalComponent>
 
@@ -545,7 +623,8 @@ const Tasks: FC<{ user: User, themeMode: 'light' | 'dark' }> = ({ user, themeMod
             onCloseHandle={() => setError({message: "", isVisible: false})}
         />
     </Fragment>
-    )
+ 
+       )
 }
 
 export default Tasks
