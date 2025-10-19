@@ -30,3 +30,7 @@ The to-do list app includes several basic functions:
 [Diagrams](docs/Diagrams)
 
 [Source code](code)
+
+[Test Plan](docs/Testing/TestPlan.md)  
+
+[Test Results](docs/Testing/TestResultsTemplate.md)  
