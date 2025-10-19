@@ -1,7 +1,6 @@
 # Client-specific ignores (Node + frontend build)
 
 # Build output (webpack)
-/public/
 /dist/
 /build/
 
