@@ -27,17 +27,21 @@ The following components are subject to testing:
 
 ## 4. Features to Be Tested
 ### Functional:
-- User Authentication (Login, Logout, Registration)
-- Task CRUD Operations (Create, Read, Update, Delete)
+- User Authentication (Login, Logout, Registration with JWT)
+- Task CRUD Operations (Create, Read, Update, Delete with extended attributes)
 - Task Completion Toggle
-- Bulk Clear Completed Tasks
+- Task Importance Marking
+- Due Date Management
 - Task Filtering (All, Important, Completed)
+- Theme Switching (Light/Dark mode)
+- Responsive UI (Mobile & Desktop)
 
 ### Non-Functional:
-- UI Responsiveness (Mobile & Desktop)
+- UI Responsiveness across devices
 - Security (Password Hashing, JWT Validation, HTTPS)
-- Accessibility (Keyboard Navigation, Color Contrast)
+- Accessibility (Keyboard Navigation, Color Contrast in both themes)
 - Error Handling and User Feedback
+- Theme Consistency
 
 ## 5. Test Approach
 - **Unit Testing**: JUnit & Mockito for backend; Jest & React Testing Library for frontend.
@@ -47,19 +51,18 @@ The following components are subject to testing:
 - **Security Testing**: Manual review of authentication and data access controls.
 
 ## 6. Pass/Fail Criteria
-- All critical test cases must pass.
-- No security vulnerabilities should be found.
-- UI must be responsive on all target devices and browsers.
-- All functional user stories from SRS must be verifiable.
-
 ### Test Scenarios (Examples):
+
 | ID  | Purpose | Scenario | Expected Result |
 |-----|---------|----------|-----------------|
-| TC1 | User Login | Enter valid credentials | Redirect to main task screen |
-| TC2 | Create Task | Add a new task via UI | Task appears in the list |
-| TC3 | Mark Task Complete | Click checkbox next to task | Task is visually marked as done |
-| TC4 | Clear Completed | Click "Clear Completed" | All completed tasks are removed |
-| TC5 | Invalid Login | Enter wrong password | Show error message |
+| TC1 | User Login | Enter valid credentials | Redirect to main task screen with JWT token stored |
+| TC2 | Create Task | Add task with title, description, due date and importance | Task appears in list with all attributes |
+| TC3 | Mark Task Complete | Click checkbox next to task | Task is visually marked as done and moves to completed filter |
+| TC4 | Theme Switching | Click theme toggle button | Interface changes between light and dark themes |
+| TC5 | Due Date Setting | Set due date for task | Date is saved and displayed correctly |
+| TC6 | Task Importance | Mark task as important | Task appears in important filter and has visual indicator |
+| TC7 | Mobile Responsiveness | Use app on mobile device | All UI elements are accessible and properly sized |
+| TC8 | Form Validation | Submit empty task form | Appropriate error messages displayed |
 
 ## 7. Conclusion
 This test plan ensures that the Pinboard application is thoroughly validated against both functional and non-functional requirements. Successful execution of this plan will confirm that the system is secure, usable, and reliable for end-users.

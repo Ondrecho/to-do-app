@@ -162,15 +162,17 @@ Anyone needing occasional task tracking or interested in trying productivity too
 <a name="task-management"/>
 
 #### 3.1.1.2 Task Management
-**Description.** Authenticated users can perform full CRUD operations on their tasks.
+**Description.** Authenticated users can perform full CRUD operations on their tasks with extended attributes.
 
 | Function | Requirements |
 |:---|:---|
-| Create task | Users must be able to create new tasks with descriptive text |
-| Read tasks | Users must be able to view all their tasks in an organized list |
-| Update task | Users must be able to modify task text and completion status |
-| Delete task | Users must be able to remove tasks individually or in bulk |
+| Create task | Users must be able to create new tasks with title, description, due date, and importance flag |
+| Read tasks | Users must be able to view all their tasks in an organized grid layout |
+| Update task | Users must be able to modify task text, due date, importance, and completion status |
+| Delete task | Users must be able to remove tasks individually |
 | Mark completion | Users must be able to toggle task completion status |
+| Set due dates | Users must be able to set and modify task due dates |
+| Mark importance | Users must be able to mark tasks as important |
 
 <a name="task-organization"/>
 
