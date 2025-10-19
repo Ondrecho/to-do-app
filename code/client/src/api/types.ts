@@ -23,7 +23,7 @@ export type Task = {
     userId: number,
     title: string,
     description: string,
-    isImportant: boolean,
+    important: boolean,
     completed: boolean, 
     createdAt: Date |
 string

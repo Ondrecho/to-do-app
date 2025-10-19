@@ -34,10 +34,7 @@ export const method = {
         },
 
         create(data: Task): Promise<AxiosResponse<Task>> {
-            return api.post<Task>("/task", {
-                ...data,
-                completed: false, 
-            });
+                    return api.post<Task>("/task", data);
         },
 
         update(data: Task): Promise<AxiosResponse<Task>> {

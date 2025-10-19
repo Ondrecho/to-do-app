@@ -23,9 +23,7 @@ const Form: FC<{
 }> = ({ isCreating, setError, setTasksList, currentTask, userId, setIsOpen }) => {
 
     const userContext = useContext(UserContext) as UserContextType
-
     if (!userContext || !userContext.user) return null;
-
     const { user } = userContext;
 
     const [formData, setFormData] = useState<Task>({
@@ -34,9 +32,21 @@ const Form: FC<{
         description: currentTask.description || "",
         userId: user.id,
         createdAt: currentTask.createdAt || new Date(),
-        isImportant: currentTask.isImportant || false,
+        important: currentTask.important || false,
         completed: currentTask.completed || false 
     })
+
+    useEffect(() => {
+            setFormData({
+                id: currentTask.id,
+                title: currentTask.title || "",
+                description: currentTask.description || "",
+                userId: user.id,
+                createdAt: currentTask.createdAt || new Date(),
+                important: currentTask.important || false,
+                completed: currentTask.completed || false 
+            })
+        }, [currentTask, user.id]) 
 
     const handleFormChange = (field: keyof Task, value: any) => {
         setFormData({ ...formData, [field]: value })
@@ -64,7 +74,7 @@ const Form: FC<{
                 title: formData.title,
                 description: formData.description,
                 createdAt: formData.createdAt,
-                isImportant: formData.isImportant,
+                important: formData.important,
                 completed: false 
             });
 
@@ -135,11 +145,11 @@ const Form: FC<{
             </Box>}
 
             <Box sx={style}>
-                <Typography sx={{ width: "100px" }}>Is Important: </Typography>
+                <Typography sx={{ width: "100px" }}>Important: </Typography>
                 
                 <Checkbox 
-                    checked={Boolean(formData.isImportant)} 
-                    onChange={(e) => handleFormChange("isImportant", e.target.checked)} 
+                    checked={Boolean(formData.important)} 
+                    onChange={(e) => handleFormChange("important", e.target.checked)} 
                 />
             </Box>
 
@@ -184,6 +194,7 @@ const Aside: FC<{
         >
             <Typography 
                 variant="h6" 
+                align="center"
                 sx={{ 
                     color: theme.palette.mode === 'light' ? '#1e1e1e' : theme.palette.text.primary, 
                     marginBottom: '10px' 
@@ -245,7 +256,7 @@ const Tasks: FC<{ user: User, themeMode: 'light' | 'dark' }> = ({ user, themeMod
         description: "",
         userId: user.id,
         createdAt: new Date(),
-        isImportant: false,
+        important: false,
         completed: false 
     })
 
@@ -304,7 +315,7 @@ const Tasks: FC<{ user: User, themeMode: 'light' | 'dark' }> = ({ user, themeMod
     const getFilteredTasks = (): Task[] => {
         switch (currentFilter) {
             case 'important':
-                return tasksList.filter(task => task.isImportant && !task.completed);
+                return tasksList.filter(task => task.important && !task.completed);
             case 'completed':
                 return tasksList.filter(task => task.completed);
             case 'all':
@@ -342,7 +353,7 @@ const Tasks: FC<{ user: User, themeMode: 'light' | 'dark' }> = ({ user, themeMod
             description: "",
             userId: user.id,
             createdAt: new Date(),
-            isImportant: false,
+            important: false,
             completed: false 
         })
         setIsCreating(true)
@@ -441,7 +452,7 @@ const Tasks: FC<{ user: User, themeMode: 'light' | 'dark' }> = ({ user, themeMod
                             const isTaskDone = task.completed;
                             const textColor = getTaskTextColor(isTaskDone); 
                             
-                            const cardBg = task.isImportant 
+                            const cardBg = task.important 
                                 ? themeMode === 'light' ? '#fffdbc' : '#2d2d48'
                                 : themeMode === 'light' ? '#ffffff' : '#1e1e1e';
                             
