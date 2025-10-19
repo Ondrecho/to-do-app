@@ -28,14 +28,15 @@ public class TaskService implements ITaskService {
     public TaskDto createTask(TaskDto dto, Long userId) {
         String trimmedTitle = dto.getTitle().trim();
         String trimmedDescription = dto.getDescription().trim();
-        OffsetDateTime createdAt = dto.getCreatedAt() != null ? dto.getCreatedAt() : OffsetDateTime.now();
+        OffsetDateTime dueDate = dto.getDueDate() != null ? dto.getDueDate() : OffsetDateTime.now();
 
         Task task = new Task();
         task.setTitle(trimmedTitle);
         task.setDescription(trimmedDescription);
         task.setImportant(dto.isImportant());
         task.setCompleted(false);
-        task.setCreatedAt(createdAt);
+        task.setDueDate(dueDate);
+        task.setCreatedAt(OffsetDateTime.now());
         task.setUserId(userId);
 
         return toDto(taskRepository.save(task));
@@ -47,8 +48,8 @@ public class TaskService implements ITaskService {
             throw new BadRequestException("Task id is required for update");
         }
 
-        if (dto.getCreatedAt() == null) {
-            throw new BadRequestException("Created date is required for update");
+        if (dto.getDueDate() == null) {
+            throw new BadRequestException("Due date is required for update"); //
         }
 
         Task task = taskRepository.findById(dto.getId())
@@ -62,7 +63,7 @@ public class TaskService implements ITaskService {
         task.setDescription(dto.getDescription().trim());
         task.setImportant(dto.isImportant());
         task.setCompleted(dto.isCompleted());
-        task.setCreatedAt(dto.getCreatedAt());
+        task.setDueDate(dto.getDueDate());
 
         Task saved = taskRepository.save(task);
         return toDto(saved);
@@ -84,6 +85,7 @@ public class TaskService implements ITaskService {
         d.setDescription(task.getDescription());
         d.setImportant(task.isImportant());
         d.setCompleted(task.isCompleted());
+        d.setDueDate(task.getDueDate());
         d.setCreatedAt(task.getCreatedAt());
         d.setUserId(task.getUserId());
         return d;

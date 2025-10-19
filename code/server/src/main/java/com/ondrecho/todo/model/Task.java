@@ -19,6 +19,8 @@ public class Task {
 
     private boolean completed;
 
+    private OffsetDateTime dueDate;
+
     private OffsetDateTime createdAt;
 
     private Long userId;
@@ -33,6 +35,8 @@ public class Task {
     public void setImportant(boolean important) { this.important = important; }
     public boolean isCompleted() { return completed; }
     public void setCompleted(boolean completed) { this.completed = completed; }
+    public OffsetDateTime getDueDate() { return dueDate; }
+    public void setDueDate(OffsetDateTime dueDate) { this.dueDate = dueDate; }
     public OffsetDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(OffsetDateTime createdAt) { this.createdAt = createdAt; }
     public Long getUserId() { return userId; }

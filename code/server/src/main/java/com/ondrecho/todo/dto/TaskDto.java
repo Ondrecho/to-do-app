@@ -22,6 +22,8 @@ public class TaskDto {
 
     private boolean completed;
 
+    private OffsetDateTime dueDate;
+
     private OffsetDateTime createdAt;
 
     private Long userId;
@@ -41,6 +43,9 @@ public class TaskDto {
     @Schema(description = "Is completed flag")
     public boolean isCompleted() { return completed; }
     public void setCompleted(boolean completed) { this.completed = completed; }
+    @Schema(description = "Due date")
+    public OffsetDateTime getDueDate() { return dueDate; }
+    public void setDueDate(OffsetDateTime dueDate) { this.dueDate = dueDate; }
     @Schema(description = "Creation date")
     public OffsetDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(OffsetDateTime createdAt) { this.createdAt = createdAt; }
