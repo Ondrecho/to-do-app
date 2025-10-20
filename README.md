@@ -33,4 +33,4 @@ The to-do list app includes several basic functions:
 
 [Test Plan](docs/Testing/TestPlan.md)  
 
-[Test Results](docs/Testing/TestResultsTemplate.md)  
+[Test Results](docs/Testing/TestResults.md)  
